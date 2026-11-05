@@ -15,6 +15,13 @@ public final class VaultTest {
         if (ok) passed++; else { failed++; System.out.println("FAIL: " + name); }
     }
 
+    static boolean catalogOk() {
+        java.util.Set<String> types = new java.util.HashSet<>(Arrays.asList(Field.TEXT, Field.HIDDEN, Field.MULTILINE, Field.HIDDEN_MULTILINE,
+                Field.EMAIL, Field.PHONE, Field.URL, Field.NUMBER, Field.PIN, Field.DATE, Field.TOTP));
+        for (String[] f : FieldCatalog.FIELDS) if (f.length != 3 || !types.contains(f[2])) return false;
+        return true;
+    }
+
     public static void main(String[] args) throws Exception {
         // AES-GCM
         byte[] k = Crypto.random(32);
@@ -34,7 +41,7 @@ public final class VaultTest {
         Crypto.deriveKey("pw12345678".toCharArray(), salt, Vault.ITERATIONS);
         System.out.printf("PBKDF2 %d iterations on this JVM: %d ms%n", Vault.ITERATIONS, (System.nanoTime() - t0) / 1_000_000);
 
-        // Same layering as Vault.create / openOuter / openInner, with a software key standing in for the Keystore key
+        // Old 0.1.0002 layering (fingerprint AND password), with a software key standing in for the Keystore key
         byte[] bioKey = Crypto.random(32);
         char[] master = "Correct horse 9!".toCharArray();
         byte[] vaultKey = Crypto.random(32);
@@ -71,6 +78,30 @@ public final class VaultTest {
         int n = Vault.merge(mine, restored);
         check("merge adds new and replaces older", n == 2 && mine.size() == 2 && mine.get(0).password.equals(a.password));
         check("merge is idempotent", Vault.merge(mine, restored) == 0);
+
+        // extra fields survive save / backup
+        Entry withFields = new Entry(); withFields.title = "Maybank";
+        Field pin = new Field("PIN", Field.PIN); pin.value = "123456"; withFields.fields.add(pin);
+        Field q = new Field("Security question", Field.TEXT); q.value = "First school?"; withFields.fields.add(q);
+        ArrayList<Entry> one = new ArrayList<>(); one.add(withFields);
+        Entry wf = Vault.parseEntries(Crypto.utf8(Vault.entriesJson(one))).get(0);
+        check("fields round trip", wf.fields.size() == 2 && wf.fields.get(0).type.equals(Field.PIN) && wf.fields.get(0).value.equals("123456") && wf.fields.get(0).isHidden());
+        Entry old = Vault.parseEntries(Crypto.utf8("{\"v\":1,\"entries\":[{\"id\":\"x\",\"title\":\"Old\"}]}")).get(0);
+        check("entries from 0.1.0002 load with no fields", old.fields.isEmpty() && old.title.equals("Old"));
+        check("field catalog types valid", catalogOk());
+
+        // 2FA codes, RFC 6238 test vectors (SHA-1)
+        Totp t8 = Totp.parse("otpauth://totp/Test?secret=GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ&digits=8&period=30");
+        check("totp 59", t8 != null && t8.code(59_000L).equals("94287082"));
+        check("totp 1111111109", t8.code(1111111109_000L).equals("07081804"));
+        check("totp 2000000000", t8.code(2000000000_000L).equals("69279037"));
+        Totp t6 = Totp.parse("gezd gnbv gy3t qojq gezd gnbv gy3t qojq");
+        check("totp plain secret, 6 digits", t6 != null && t6.code(59_000L).equals("287082") && t6.secondsLeft(59_000L) == 1);
+        check("totp rejects junk", Totp.parse("not a secret!") == null && Totp.parse("") == null);
+
+        // a 0.1.0002 vault's password-wrapped key is exactly what the new format stores as "pw"
+        byte[] legacyInner = Crypto.seal(Crypto.deriveKey(master, salt, 1000), vaultKey);
+        check("upgrade keeps password unlock", Arrays.equals(vaultKey, Crypto.open(Crypto.deriveKey(master, salt, 1000), legacyInner)));
 
         // generator
         for (int i = 0; i < 200; i++) {

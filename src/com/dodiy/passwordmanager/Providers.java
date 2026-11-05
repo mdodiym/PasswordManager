@@ -27,8 +27,11 @@ final class Providers {
             "spotify", "paypal", "dropbox", "steam", "epicgames", "playstation", "xbox", "proton", "gmail",
             "icloud", "okta", "auth0", "zoom", "youtube", "twitch", "snapchat", "pinterest", "shopee", "grab",
             "binance", "coinbase", "openai", "anthropic", "adobe", "atlassian", "bitbucket", "notion", "figma",
-            "canva", "maybank", "cimb", "lazada"
+            "canva"
     };
+
+    /** Malaysian banks, e-wallets, telcos, government services … (assets/malaysia.tsv), in file order. */
+    private static List<Provider> malaysia = new ArrayList<>();
 
     /** Brands missing from Simple Icons (removed at the brand's request). Shown as brand-coloured badges. */
     private static final String[][] EXTRAS = {
@@ -53,9 +56,6 @@ final class Providers {
             {"oracle", "Oracle", "F80000", "O", ""},
             {"ibm", "IBM", "0F62FE", "IBM", ""},
             {"canva", "Canva", "00C4CC", "C", ""},
-            {"maybank", "Maybank", "FFC800", "M", "Maybank2u|MAE"},
-            {"cimb", "CIMB", "EC1C24", "C", "CIMB Clicks|OCTO"},
-            {"lazada", "Lazada", "0F146D", "L", ""},
             {"walmart", "Walmart", "0071CE", "W", ""},
             {"disneyplus", "Disney+", "113CCF", "D+", "Disney Plus|Hotstar"},
             {"primevideo", "Prime Video", "00A8E1", "P", "Amazon Prime"},
@@ -64,15 +64,6 @@ final class Providers {
             {"bing", "Microsoft Bing", "008373", "b", "Bing"},
             {"twilio", "Twilio", "F22F46", "T", "Authy"},
             {"agoda", "Agoda", "5542F6", "a", ""},
-            {"touchngo", "Touch 'n Go eWallet", "005ABB", "TnG", "TNG|Touch n Go"},
-            {"publicbank", "Public Bank", "D7262D", "PB", "PBe"},
-            {"rhb", "RHB", "005BAA", "RHB", ""},
-            {"hongleongbank", "Hong Leong Bank", "002D74", "HL", "HLB Connect"},
-            {"bankislam", "Bank Islam", "E20E78", "BI", "GO by Bank Islam"},
-            {"myeg", "MyEG", "0057A8", "EG", ""},
-            {"mysejahtera", "MySejahtera", "1E88E5", "MS", ""},
-            {"lhdn", "LHDN MyTax", "1A3C8C", "LH", "MyTax|Hasil"},
-            {"kwsp", "KWSP i-Akaun", "0B5BA8", "KW", "EPF|i-Akaun"},
     };
 
     static synchronized List<Provider> all(Context c) {
@@ -90,6 +81,11 @@ final class Providers {
         if (slug == null || slug.isEmpty()) return null;
         all(c);
         return bySlug.get(slug);
+    }
+
+    static List<Provider> malaysia(Context c) {
+        all(c);
+        return malaysia;
     }
 
     static List<Provider> popular(Context c) {
@@ -117,11 +113,33 @@ final class Providers {
         return null;
     }
 
+    private static Context appContext;
+
+    /** Decodes a downloaded icon the first time it is shown (128 px PNG, about 64 KB in memory). */
+    static void loadBitmap(Provider p) {
+        if (p.bitmap != null || appContext == null) return;
+        try {
+            java.io.InputStream in = appContext.getAssets().open(p.data);
+            try { p.bitmap = android.graphics.BitmapFactory.decodeStream(in); } finally { in.close(); }
+        } catch (Exception ignored) {}
+    }
+
+    static String initialsOf(String title) {
+        StringBuilder b = new StringBuilder();
+        for (String w : title.split("[^A-Za-z0-9]+")) {
+            if (w.isEmpty()) continue;
+            b.append(Character.toUpperCase(w.charAt(0)));
+            if (b.length() == 2) break;
+        }
+        return b.length() == 0 ? "?" : b.toString();
+    }
+
     static String norm(String s) {
         return s == null ? "" : s.toLowerCase(Locale.ROOT).replace("+", "plus").replaceAll("[^a-z0-9]", "");
     }
 
     private static void load(Context c) {
+        appContext = c.getApplicationContext();
         ArrayList<Provider> list = new ArrayList<>(3600);
         HashMap<String, Provider> map = new HashMap<>(5000);
         try {
@@ -141,6 +159,33 @@ final class Providers {
         } catch (Exception e) {
             android.util.Log.e("Providers", "Could not load logos", e);
         }
+        ArrayList<Provider> my = new ArrayList<>();
+        try {
+            java.util.HashSet<String> images = new java.util.HashSet<>();
+            String[] files = c.getAssets().list("logos");
+            if (files != null) for (String f : files) images.add(f);
+            BufferedReader r = new BufferedReader(new InputStreamReader(c.getAssets().open("malaysia.tsv"), StandardCharsets.UTF_8));
+            try {
+                String line;
+                while ((line = r.readLine()) != null) {
+                    if (line.startsWith("#") || line.trim().isEmpty()) continue;
+                    String[] f = line.split("\t", -1);
+                    if (f.length < 6 || map.containsKey(f[0])) continue;
+                    boolean img = images.contains(f[0] + ".png");
+                    Provider p = new Provider(f[0], f[1], Color.parseColor("#" + f[2]), f[4] + "|Malaysia|" + f[5],
+                            img ? Provider.IMAGE : Provider.LETTERS, img ? "logos/" + f[0] + ".png" : initialsOf(f[1]));
+                    p.category = f[5];
+                    list.add(p);
+                    my.add(p);
+                    map.put(p.slug, p);
+                }
+            } finally {
+                r.close();
+            }
+        } catch (Exception e) {
+            android.util.Log.e("Providers", "Could not load Malaysian logos", e);
+        }
+        malaysia = my;
         for (String[] x : EXTRAS) {
             if (map.containsKey(x[0])) continue;
             int kind = "microsoft".equals(x[0]) ? Provider.MICROSOFT : Provider.LETTERS;

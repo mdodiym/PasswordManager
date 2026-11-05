@@ -69,6 +69,11 @@ public final class PickerActivity extends BaseActivity {
             if (!browse) rows.add(NONE);
             rows.add("Popular");
             rows.addAll(Providers.popular(this));
+            String cat = null;
+            for (Provider p : Providers.malaysia(this)) {
+                if (!p.category.equals(cat)) { cat = p.category; rows.add("Malaysia · " + cat); }
+                rows.add(p);
+            }
             rows.add("All providers A to Z");
             rows.addAll(all);
         } else {
@@ -115,7 +120,8 @@ public final class PickerActivity extends BaseActivity {
                 Provider p = (Provider) o;
                 logo.setImageDrawable(new LogoDrawable(p, p.title));
                 title.setText(p.title);
-                String extra = p.aliases.isEmpty() ? "" : p.aliases.replace("|", ", ");
+                String extra = p.category.isEmpty() ? (p.aliases.isEmpty() ? "" : p.aliases.replace("|", ", "))
+                        : p.category + " · Malaysia";
                 sub.setText(p.kind == Provider.LETTERS ? (extra.isEmpty() ? "Brand-colour badge" : extra + " · brand-colour badge") : extra);
                 sub.setVisibility(sub.getText().length() == 0 ? View.GONE : View.VISIBLE);
             }

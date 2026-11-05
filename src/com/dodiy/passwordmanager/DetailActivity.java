@@ -15,6 +15,20 @@ import java.util.Date;
 public final class DetailActivity extends BaseActivity {
     private String id;
     private boolean reveal;
+    private final java.util.HashSet<Integer> revealed = new java.util.HashSet<>();
+    private final java.util.ArrayList<Object[]> codes = new java.util.ArrayList<>();   // {TextView, Totp}
+    private final android.os.Handler handler = new android.os.Handler(android.os.Looper.getMainLooper());
+    private final Runnable tick = new Runnable() {
+        @Override public void run() {
+            long now = System.currentTimeMillis();
+            for (Object[] c : codes) {
+                Totp t = (Totp) c[1];
+                String code = t.code(now);
+                ((TextView) c[0]).setText(code.substring(0, code.length() / 2) + " " + code.substring(code.length() / 2) + "   (" + t.secondsLeft(now) + "s)");
+            }
+            if (!codes.isEmpty()) handler.postDelayed(this, 1000);
+        }
+    };
 
     @Override protected void onCreate(Bundle b) {
         super.onCreate(b);
@@ -41,6 +55,8 @@ public final class DetailActivity extends BaseActivity {
     @Override protected void onPause() {
         super.onPause();
         reveal = false;
+        revealed.clear();
+        handler.removeCallbacks(tick);
     }
 
     private void bind(final Entry e) {
@@ -63,6 +79,11 @@ public final class DetailActivity extends BaseActivity {
             });
         }
 
+        codes.clear();
+        handler.removeCallbacks(tick);
+        for (int i = 0; i < e.fields.size(); i++) extraField(fields, e.fields.get(i), i, e);
+        if (!codes.isEmpty()) handler.post(tick);
+
         if (!e.url.isEmpty()) field(fields, "Website", e.url, false, "Open", new Runnable() {
             @Override public void run() {
                 String u = e.url.contains("://") ? e.url : "https://" + e.url;
@@ -80,7 +101,50 @@ public final class DetailActivity extends BaseActivity {
         ((TextView) findViewById(R.id.dates)).setText("Created " + df.format(c) + " " + tf.format(c) + "\nLast changed " + df.format(u) + " " + tf.format(u));
     }
 
-    private void field(LinearLayout parent, String label, String value, boolean mono,
+    private void extraField(LinearLayout parent, final Field f, final int index, final Entry e) {
+        if (Field.TOTP.equals(f.type)) {
+            final Totp t = Totp.parse(f.value);
+            if (t == null) {
+                field(parent, f.label, "Not a valid 2FA secret key", false, null, null, null, null);
+                return;
+            }
+            View v = field(parent, f.label + " · one-time code", "", true, "Copy", new Runnable() {
+                @Override public void run() { App.copySecret(t.code(System.currentTimeMillis()), true); Ui.toast(DetailActivity.this, "Code copied"); }
+            }, null, null);
+            TextView val = v.findViewById(R.id.value);
+            val.setTextSize(22);
+            codes.add(new Object[]{val, t});
+            return;
+        }
+        final boolean shown = revealed.contains(index);
+        String text = f.isHidden() && !shown ? "••••••••" : f.value;
+        Runnable copy = new Runnable() {
+            @Override public void run() { App.copySecret(f.value, f.isHidden()); Ui.toast(DetailActivity.this, f.label + " copied" + (f.isHidden() ? ". Clipboard clears in 45 seconds." : "")); }
+        };
+        if (f.isHidden()) {
+            field(parent, f.label, text, true, shown ? "Hide" : "Show", new Runnable() {
+                @Override public void run() {
+                    if (!revealed.remove(index)) revealed.add(index);
+                    bind(e);
+                }
+            }, "Copy", copy);
+        } else if (Field.URL.equals(f.type)) {
+            field(parent, f.label, text, false, "Open", new Runnable() {
+                @Override public void run() {
+                    String u = f.value.contains("://") ? f.value : "https://" + f.value;
+                    startExternal(new Intent(Intent.ACTION_VIEW, Uri.parse(u)));
+                }
+            }, "Copy", copy);
+        } else if (Field.PHONE.equals(f.type)) {
+            field(parent, f.label, text, false, "Call", new Runnable() {
+                @Override public void run() { startExternal(new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + f.value))); }
+            }, "Copy", copy);
+        } else {
+            field(parent, f.label, text, false, "Copy", copy, null, null);
+        }
+    }
+
+    private View field(LinearLayout parent, String label, String value, boolean mono,
                        String b1, final Runnable a1, String b2, final Runnable a2) {
         View v = getLayoutInflater().inflate(R.layout.item_field, parent, false);
         ((TextView) v.findViewById(R.id.label)).setText(label);
@@ -91,6 +155,7 @@ public final class DetailActivity extends BaseActivity {
         button(t1, b1, a1);
         button(t2, b2, a2);
         parent.addView(v);
+        return v;
     }
 
     private static void button(TextView t, String label, final Runnable action) {

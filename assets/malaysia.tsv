@@ -1,0 +1,101 @@
+# slug	title	brand colour	domains to try (first = main site)	aliases (| separated)	category
+maybank	Maybank	FFC800	maybank2u.com.my,maybank.com.my,maybank.com	Maybank2u|MAE|M2U	Bank
+cimb	CIMB Bank	EC1C24	cimb.com.my,cimbclicks.com.my,cimb.com	CIMB Clicks|CIMB OCTO|OCTO	Bank
+publicbank	Public Bank	D7262D	pbebank.com,publicbank.com.my	PBe|Public Bank Berhad	Bank
+rhb	RHB Bank	005BAA	rhbgroup.com,rhbgroup.com.my	RHB Now|RHB Online Banking	Bank
+hongleongbank	Hong Leong Bank	002D74	hlb.com.my,hongleongconnect.my	HLB|HLB Connect	Bank
+ambank	AmBank	ED1C24	ambank.com.my,ambankgroup.com	AmOnline|AmBank Group	Bank
+bankislam	Bank Islam	E20E78	bankislam.com,bankislam.com.my	GO by Bank Islam|BIMB	Bank
+bankrakyat	Bank Rakyat	0072BC	bankrakyat.com.my	iRakyat	Bank
+bsn	BSN	0066B3	mybsn.com.my	Bank Simpanan Nasional|myBSN	Bank
+affinbank	Affin Bank	0A3D7E	affinalways.com,affingroup.com	AffinAlways|AffinMax	Bank
+alliancebank	Alliance Bank	6B2C91	alliancebank.com.my	allianceonline	Bank
+bankmuamalat	Bank Muamalat	6D2077	muamalat.com.my	i-Muamalat	Bank
+ocbcmalaysia	OCBC Malaysia	E30613	ocbc.com.my	OCBC	Bank
+uobmalaysia	UOB Malaysia	005EB8	uob.com.my	UOB|UOB TMRW	Bank
+hsbcmalaysia	HSBC Malaysia	DB0011	hsbc.com.my	HSBC Amanah	Bank
+standardchartered	Standard Chartered	0473EA	sc.com	SC Malaysia	Bank
+agrobank	Agrobank	00843D	agrobank.com.my	AgroNet	Bank
+alrajhi	Al Rajhi Bank Malaysia	1D3C8F	alrajhibank.com.my	Al Rajhi	Bank
+mbsb	MBSB Bank	00A0DF	mbsbbank.com	MBSB	Bank
+gxbank	GXBank	5B2D8F	gxbank.my	GX Bank	Bank
+boostbank	Boost Bank	EE2E24	myboostbank.co	Boost Bank	Bank
+aeonbank	AEON Bank	B60081	aeonbank.com.my	AEON Bank Malaysia	Bank
+touchngo	Touch 'n Go eWallet	005ABB	touchngo.com.my,tngdigital.com.my	TNG|Touch n Go|TnG eWallet	E-wallet
+boostmy	Boost eWallet	EE2E24	myboost.com.my	Boost Malaysia	E-wallet
+bigpay	BigPay	1A1A1A	bigpayme.com	Big Pay	E-wallet
+setel	Setel	00A19A	setel.com	Setel Malaysia	E-wallet
+duitnow	DuitNow	E6007E	duitnow.my	DuitNow QR	Payments
+paynet	PayNet (FPX)	00A3E0	paynet.my	FPX|MyDebit	Payments
+maxis	Maxis	00A650	maxis.com.my	Hotlink|Maxis Fibre	Telco
+celcomdigi	CelcomDigi	0050FF	celcomdigi.com	Celcom|Digi	Telco
+umobile	U Mobile	FF6600	u.com.my	UMobile	Telco
+unifi	Unifi	F26522	unifi.com.my	TM Unifi|myUnifi	Telco
+tm	Telekom Malaysia	0B4EA2	tm.com.my	TM	Telco
+yes	Yes 5G	F6A200	yes.my	Yes Malaysia	Telco
+timedotcom	TIME	12385E	time.com.my	TIME Fibre|TIME dotCom	Telco
+redone	redONE	E1251B	redone.com.my	red one	Telco
+tunetalk	Tune Talk	E3000F	tunetalk.com	TuneTalk	Telco
+xox	XOX	0057B8	xox.com.my	XOX Mobile	Telco
+astromalaysia	Astro	E6007E	astro.com.my	Astro Malaysia|Astro GO|sooka	Media
+mygov	MyGOV Malaysia	0B3D91	malaysia.gov.my	MyGov|Portal Rasmi Kerajaan	Government
+mydigitalid	MyDigital ID	0B3D91	mydigital.gov.my	MyDigitalID	Government
+lhdn	LHDN MyTax	1A3C8C	hasil.gov.my,mytax.hasil.gov.my	MyTax|Hasil|e-Filing|Inland Revenue	Government
+kwsp	KWSP i-Akaun	0B5BA8	kwsp.gov.my	EPF|i-Akaun	Government
+perkeso	PERKESO	0D4D9C	perkeso.gov.my	SOCSO	Government
+jpj	JPJ	1F3A93	jpj.gov.my	MyJPJ|Road Transport Department	Government
+myeg	MyEG	0057A8	myeg.com.my	MyEG Services	Government
+mysejahtera	MySejahtera	1E88E5	mysejahtera.malaysia.gov.my	MySJ	Government
+imigresen	Imigresen Malaysia	1B2F6E	imi.gov.my	Immigration|MyImigresen	Government
+ptptn	PTPTN	E31E24	ptptn.gov.my	myPTPTN	Government
+ssm	SSM	0D3C84	ssm.com.my	EzBiz|Suruhanjaya Syarikat Malaysia	Government
+tabunghaji	Tabung Haji	00843D	lth.gov.my	THiJARI|Lembaga Tabung Haji	Government
+asnb	ASNB	00599C	asnb.com.my	myASNB|ASB	Investment
+bnm	Bank Negara Malaysia	0E2B5C	bnm.gov.my	BNM	Government
+bursamalaysia	Bursa Malaysia	003A70	bursamalaysia.com	Bursa	Investment
+pdrm	PDRM	0B2D6B	rmp.gov.my	Polis Diraja Malaysia	Government
+tnb	TNB	E31837	tnb.com.my,mytnb.com.my	myTNB|Tenaga Nasional	Utilities
+airselangor	Air Selangor	0096D6	airselangor.com	Air Selangor	Utilities
+indahwater	Indah Water	0084C9	iwk.com.my	IWK	Utilities
+malaysiaairlines	Malaysia Airlines	00205B	malaysiaairlines.com	MAS|Enrich	Travel
+batikair	Batik Air	C8102E	batikair.com	Malindo	Travel
+firefly	Firefly	F37021	fireflyz.com.my	Firefly Airlines	Travel
+ktmb	KTMB	003C82	ktmb.com.my	KTM|KITS	Travel
+myrapid	Rapid KL	E2231A	myrapid.com.my	Prasarana|MyRapid PULSE	Travel
+plus	PLUS Malaysia	0054A6	plus.com.my	PLUS Highway	Travel
+petronas	Petronas	00A19A	petronas.com,mymesra.com.my	Mesra|Setel	Fuel
+shellmy	Shell Malaysia	FBCE07	shell.com.my	Shell	Fuel
+petron	Petron	0033A0	petron.com.my	Petron Miles	Fuel
+bhpetrol	BHPetrol	E31E24	bhpetrol.com.my	BHP	Fuel
+shopeemy	Shopee Malaysia	EE4D2D	shopee.com.my	ShopeePay	Shopping
+lazada	Lazada	0F146D	lazada.com.my	Lazada Malaysia	Shopping
+zalora	Zalora	000000	zalora.com.my	Zalora Malaysia	Shopping
+mrdiy	MR DIY	FFDD00	mrdiy.com	Mr. DIY	Shopping
+lotuss	Lotus's	00A19B	lotuss.com.my	Lotuss|Tesco Malaysia	Shopping
+aeonmy	AEON Malaysia	B60081	aeonretail.com.my	AEON|AEON Member	Shopping
+mydin	Mydin	E2001A	mydin.com.my	Mydin Online	Shopping
+pgmall	PG Mall	E52421	pgmall.my	PGMall	Shopping
+watsonsmy	Watsons Malaysia	009AA6	watsons.com.my	Watsons	Shopping
+guardianmy	Guardian Malaysia	E2001A	guardian.com.my	Guardian	Shopping
+foodpandamy	foodpanda Malaysia	D70F64	foodpanda.my	pandamart	Food
+zuscoffee	ZUS Coffee	1B2A5F	zuscoffee.com	ZUS	Food
+tealive	Tealive	6E2C8F	tealive.com.my	Tealive Malaysia	Food
+mudah	Mudah.my	FF6F00	mudah.my	Mudah	Marketplace
+carousell	Carousell	EE2E24	carousell.com.my	Carousell Malaysia	Marketplace
+jobstreet	JobStreet	0D3880	jobstreet.com.my,jobstreet.com	SEEK	Jobs
+hiredly	Hiredly	512ACC	hiredly.com	Maukerja	Jobs
+iproperty	iProperty	E31E24	iproperty.com.my	iProperty Malaysia	Property
+propertyguru	PropertyGuru	00A0DF	propertyguru.com.my	PropertyGuru Malaysia	Property
+greateastern	Great Eastern	C8102E	greateasternlife.com	Great Eastern Life	Insurance
+prudentialmy	Prudential Malaysia	ED1B2E	prudential.com.my	PRUaccess|Prudential	Insurance
+aiamy	AIA Malaysia	D31145	aia.com.my	AIA+|AIA	Insurance
+allianzmy	Allianz Malaysia	003781	allianz.com.my	Allianz	Insurance
+etiqa	Etiqa	FFC800	etiqa.com.my	Etiqa Insurance|Etiqa Takaful	Insurance
+takafulmalaysia	Takaful Malaysia	00843D	takaful-malaysia.com.my	Takaful|i-Great	Insurance
+stashaway	StashAway	2E5BFF	stashaway.my	StashAway Malaysia	Investment
+versa	Versa	3D2BEF	versa.com.my	Versa Malaysia	Investment
+rakutentrade	Rakuten Trade	BF0000	rakutentrade.my	Rakuten	Investment
+moomoomy	moomoo Malaysia	FF6E00	moomoo.com	moomoo	Investment
+luno	Luno	0D6EFD	luno.com	Luno Malaysia	Investment
+indrive	inDrive	C1F11D	indrive.com	inDriver	Transport
+airasiamove	AirAsia MOVE	FF0000	airasia.com	AirAsia Super App	Travel

@@ -17,6 +17,7 @@ final class LogoDrawable extends Drawable {
     private final Paint bg = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint fg = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint ring = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint img = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG);
 
     private static final int[] PALETTE = {
             0xFF3949AB, 0xFF00897B, 0xFF6D4C41, 0xFF8E24AA, 0xFFD81B60, 0xFF5E35B1,
@@ -25,11 +26,12 @@ final class LogoDrawable extends Drawable {
 
     /** @param fallbackTitle used for the letter icon when there is no provider */
     LogoDrawable(Provider p, String fallbackTitle) {
+        if (p != null && p.kind == Provider.IMAGE) Providers.loadBitmap(p);
         provider = p;
         fallback = fallbackTitle == null ? "" : fallbackTitle.trim();
         int color;
         if (p == null) color = PALETTE[(fallback.toLowerCase().hashCode() & 0x7fffffff) % PALETTE.length];
-        else if (p.kind == Provider.MICROSOFT) color = 0xFFFFFFFF;
+        else if (p.kind == Provider.MICROSOFT || p.kind == Provider.IMAGE) color = 0xFFFFFFFF;
         else color = p.color;
         bg.setColor(color);
         fg.setColor(onColor(color));
@@ -66,6 +68,17 @@ final class LogoDrawable extends Drawable {
             canvas.scale(s, s);
             canvas.drawPath(provider.path(), fg);
             canvas.restore();
+        } else if (provider != null && provider.kind == Provider.IMAGE && provider.bitmap != null) {
+            android.graphics.Bitmap bm = provider.bitmap;
+            android.graphics.BitmapShader sh = new android.graphics.BitmapShader(bm, android.graphics.Shader.TileMode.CLAMP, android.graphics.Shader.TileMode.CLAMP);
+            android.graphics.Matrix m = new android.graphics.Matrix();
+            float sc = size / Math.max(bm.getWidth(), bm.getHeight());
+            m.setScale(sc, sc);
+            m.postTranslate(cx - bm.getWidth() * sc / 2f, cy - bm.getHeight() * sc / 2f);
+            sh.setLocalMatrix(m);
+            img.setShader(sh);
+            canvas.drawCircle(cx, cy, r, img);
+            canvas.drawCircle(cx, cy, r - ring.getStrokeWidth() / 2f, ring);
         } else if (provider != null && provider.kind == Provider.MICROSOFT) {
             float q = size * 0.24f, gap = size * 0.025f;
             int[] cols = {0xFFF25022, 0xFF7FBA00, 0xFF00A4EF, 0xFFFFB900};

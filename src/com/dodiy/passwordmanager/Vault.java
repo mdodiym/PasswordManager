@@ -12,7 +12,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,12 +19,12 @@ import javax.crypto.Cipher;
 
 /**
  * Storage layout (app-private, excluded from cloud backup):
- *   meta.json  salt, PBKDF2 iterations, biometric IV, and "outer"
+ *   meta.json  v2: salt, PBKDF2 iterations, "pw" and optionally "bio" + "bioIv"
  *   vault.bin  AES-GCM(vaultKey, entries JSON)
  *
- * outer = Keystore-AES-GCM(inner)            needs a biometric
- * inner = AES-GCM(PBKDF2(master password), vaultKey)   needs the master password
- * so both the fingerprint and the master password are needed to reach vaultKey.
+ * pw  = AES-GCM(PBKDF2(master password), vaultKey)   opens the vault with the master password
+ * bio = Keystore-AES-GCM(vaultKey)                     opens the vault with a fingerprint
+ * Either one unlocks the vault. Version 0.1.0002 (meta v1) needed both; see the legacy* methods.
  */
 final class Vault {
     private Vault() {}
@@ -42,49 +41,116 @@ final class Vault {
         return new JSONObject(Crypto.str(read(meta(c))));
     }
 
+    static boolean isLegacy(Context c) {
+        try { return readMeta(c).optInt("v", 1) < 2; } catch (Exception e) { return false; }
+    }
+
+    static boolean bioEnabled(Context c) {
+        try {
+            JSONObject m = readMeta(c);
+            return m.optInt("v", 1) >= 2 && m.has("bio");
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     // ---- setup ---------------------------------------------------------------------------------
 
-    /** Step 2 of setup, after the biometric prompt authorised {@code bioEncrypt}. Opens the session. */
-    static void create(Context c, char[] password, Cipher bioEncrypt) throws Exception {
+    /** Creates a vault that opens with the master password, and opens the session. */
+    static void create(Context c, char[] password) throws Exception {
         byte[] salt = Crypto.random(16);
         byte[] kek = Crypto.deriveKey(password, salt, ITERATIONS);
         byte[] vaultKey = Crypto.random(32);
-        byte[] inner = Crypto.seal(kek, vaultKey);
+        byte[] pw = Crypto.seal(kek, vaultKey);
         Crypto.wipe(kek);
-        byte[] outer = bioEncrypt.doFinal(inner);
-        Session.open(vaultKey, inner, new ArrayList<Entry>());
+        Session.open(vaultKey, pw, new ArrayList<Entry>());
         save(c);   // data file first, so a vault never exists without its data
-        writeMeta(c, salt, ITERATIONS, bioEncrypt.getIV(), outer);
+        JSONObject m = new JSONObject();
+        m.put("v", 2);
+        m.put("salt", Crypto.b64(salt));
+        m.put("iter", ITERATIONS);
+        m.put("pw", Crypto.b64(pw));
+        writeMeta(c, m);
     }
 
-    // ---- unlock --------------------------------------------------------------------------------
+    // ---- unlock with the master password -------------------------------------------------------
 
-    static Cipher unlockCipher(Context c) throws Exception {
+    /** Throws javax.crypto.AEADBadTagException for a wrong password. Opens the session. Slow (PBKDF2). */
+    static void unlockWithPassword(Context c, char[] password) throws Exception {
         JSONObject m = readMeta(c);
-        return BioKey.decryptCipher(Crypto.unb64(m.getString("bioIv")));
+        byte[] pw = Crypto.unb64(m.getString("pw"));
+        byte[] vaultKey = unwrap(m, pw, password);
+        Session.open(vaultKey, pw, parseEntries(Crypto.open(vaultKey, read(data(c)))));
     }
 
-    /** Biometric step: returns the password-wrapped key. */
-    static byte[] openOuter(Context c, Cipher bioDecrypt) throws Exception {
-        JSONObject m = readMeta(c);
-        return bioDecrypt.doFinal(Crypto.unb64(m.getString("outer")));
-    }
-
-    /** Password step. Throws javax.crypto.AEADBadTagException for a wrong password. Opens the session. */
-    static void openInner(Context c, byte[] inner, char[] password) throws Exception {
-        byte[] vaultKey = unwrap(c, inner, password);
-        ArrayList<Entry> list = parseEntries(Crypto.open(vaultKey, read(data(c))));
-        Session.open(vaultKey, inner, list);
-    }
-
-    private static byte[] unwrap(Context c, byte[] inner, char[] password) throws Exception {
-        JSONObject m = readMeta(c);
+    private static byte[] unwrap(JSONObject m, byte[] wrapped, char[] password) throws Exception {
         byte[] kek = Crypto.deriveKey(password, Crypto.unb64(m.getString("salt")), m.getInt("iter"));
         try {
-            return Crypto.open(kek, inner);
+            return Crypto.open(kek, wrapped);
         } finally {
             Crypto.wipe(kek);
         }
+    }
+
+    // ---- unlock with a fingerprint -------------------------------------------------------------
+
+    /** Throws KeyPermanentlyInvalidatedException when Android removed the key (fingerprints changed). */
+    static Cipher bioUnlockCipher(Context c) throws Exception {
+        return BioKey.decryptCipher(Crypto.unb64(readMeta(c).getString("bioIv")));
+    }
+
+    static void unlockWithBio(Context c, Cipher authorised) throws Exception {
+        JSONObject m = readMeta(c);
+        byte[] vaultKey = authorised.doFinal(Crypto.unb64(m.getString("bio")));
+        Session.open(vaultKey, Crypto.unb64(m.getString("pw")), parseEntries(Crypto.open(vaultKey, read(data(c)))));
+    }
+
+    /** Fresh Keystore key + cipher; show it in a biometric prompt, then call {@link #enableBio}. */
+    static Cipher prepareEnableBio() throws Exception {
+        BioKey.delete();
+        BioKey.create();
+        return BioKey.encryptCipher();
+    }
+
+    static void enableBio(Context c, Cipher authorised) throws Exception {
+        JSONObject m = readMeta(c);
+        m.put("bio", Crypto.b64(authorised.doFinal(Session.key)));
+        m.put("bioIv", Crypto.b64(authorised.getIV()));
+        writeMeta(c, m);
+    }
+
+    static void disableBio(Context c) throws Exception {
+        JSONObject m = readMeta(c);
+        m.remove("bio");
+        m.remove("bioIv");
+        writeMeta(c, m);
+        BioKey.delete();
+    }
+
+    // ---- vaults made by 0.1.0002 (fingerprint AND password) -------------------------------------
+
+    static Cipher legacyCipher(Context c) throws Exception {
+        return BioKey.decryptCipher(BioKey.LEGACY_ALIAS, Crypto.unb64(readMeta(c).getString("bioIv")));
+    }
+
+    /** Fingerprint step of the old format: returns the password-wrapped key. */
+    static byte[] legacyOpenOuter(Context c, Cipher authorised) throws Exception {
+        return authorised.doFinal(Crypto.unb64(readMeta(c).getString("outer")));
+    }
+
+    /** Password step of the old format; on success rewrites the vault in the new format and opens it. */
+    static void legacyUnlockAndUpgrade(Context c, byte[] inner, char[] password) throws Exception {
+        JSONObject m = readMeta(c);
+        byte[] vaultKey = unwrap(m, inner, password);
+        ArrayList<Entry> list = parseEntries(Crypto.open(vaultKey, read(data(c))));
+        JSONObject n = new JSONObject();
+        n.put("v", 2);
+        n.put("salt", m.getString("salt"));
+        n.put("iter", m.getInt("iter"));
+        n.put("pw", Crypto.b64(inner));       // same PBKDF2(password) wrapping, so it is the new "pw"
+        writeMeta(c, n);
+        BioKey.delete(BioKey.LEGACY_ALIAS);
+        Session.open(vaultKey, inner, list);
     }
 
     // ---- change master password ----------------------------------------------------------------
@@ -92,7 +158,7 @@ final class Vault {
     /** Checks the current password against the open session. Slow (PBKDF2), run off the UI thread. */
     static boolean checkPassword(Context c, char[] password) {
         try {
-            byte[] k = unwrap(c, Session.inner, password);
+            byte[] k = unwrap(readMeta(c), Session.inner, password);
             Crypto.wipe(k);
             return true;
         } catch (Exception e) {
@@ -100,14 +166,18 @@ final class Vault {
         }
     }
 
-    /** Re-wraps the vault key with a new password; {@code bioEncrypt} must be biometric-authorised. */
-    static void changePassword(Context c, char[] newPassword, Cipher bioEncrypt) throws Exception {
+    /** Re-wraps the vault key with a new password. Fingerprint unlock keeps working. */
+    static void changePassword(Context c, char[] newPassword) throws Exception {
+        JSONObject m = readMeta(c);
         byte[] salt = Crypto.random(16);
         byte[] kek = Crypto.deriveKey(newPassword, salt, ITERATIONS);
-        byte[] inner = Crypto.seal(kek, Session.key);
+        byte[] pw = Crypto.seal(kek, Session.key);
         Crypto.wipe(kek);
-        writeMeta(c, salt, ITERATIONS, bioEncrypt.getIV(), bioEncrypt.doFinal(inner));
-        Session.inner = inner;
+        m.put("salt", Crypto.b64(salt));
+        m.put("iter", ITERATIONS);
+        m.put("pw", Crypto.b64(pw));
+        writeMeta(c, m);
+        Session.inner = pw;
     }
 
     // ---- entries -------------------------------------------------------------------------------
@@ -141,6 +211,7 @@ final class Vault {
         //noinspection ResultOfMethodCallIgnored
         data(c).delete();
         BioKey.delete();
+        BioKey.delete(BioKey.LEGACY_ALIAS);
     }
 
     // ---- encrypted backup file (password only, so it can be restored on a new phone) ------------
@@ -186,14 +257,8 @@ final class Vault {
 
     // ---- files ---------------------------------------------------------------------------------
 
-    private static void writeMeta(Context c, byte[] salt, int iter, byte[] bioIv, byte[] outer) throws Exception {
-        JSONObject o = new JSONObject();
-        o.put("v", 1);
-        o.put("salt", Crypto.b64(salt));
-        o.put("iter", iter);
-        o.put("bioIv", Crypto.b64(bioIv));
-        o.put("outer", Crypto.b64(outer));
-        writeAtomic(meta(c), Crypto.utf8(o.toString()));
+    private static void writeMeta(Context c, JSONObject m) throws Exception {
+        writeAtomic(meta(c), Crypto.utf8(m.toString()));
     }
 
     static byte[] read(File f) throws IOException {
@@ -225,6 +290,4 @@ final class Vault {
         for (; t != null; t = t.getCause()) if (t instanceof javax.crypto.AEADBadTagException) return true;
         return false;
     }
-
-    static boolean isGeneral(Throwable t) { return t instanceof GeneralSecurityException; }
 }
