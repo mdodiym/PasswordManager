@@ -1,0 +1,92 @@
+name: Build signed APK
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Install Android build tools
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q android-sdk-build-tools dalvik-exchange zip
+
+      - name: Download android.jar (API 35 for compiling, API 33 for resources)
+        run: |
+          for api in 33 35; do
+            mkdir -p "$RUNNER_TEMP/sdk/platforms/android-$api"
+            curl -sSfL -o "$RUNNER_TEMP/sdk/platforms/android-$api/android.jar" \
+              "https://raw.githubusercontent.com/Sable/android-platforms/master/android-$api/android.jar"
+          done
+
+      - name: Unit tests (crypto, backup, logo data)
+        env:
+          ANDROID_SDK: ${{ runner.temp }}/sdk
+          JSON_JAR: ${{ runner.temp }}/json.jar
+        run: test/run.sh
+
+      - name: Set up release key
+        if: github.event_name != 'pull_request'
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          if [ -z "$KEYSTORE_BASE64" ]; then echo "::error::Signing secrets are not set"; exit 1; fi
+          dir="$RUNNER_TEMP/signing"; mkdir -p "$dir"
+          echo "$KEYSTORE_BASE64" | base64 -d > "$dir/release.jks"
+          printf 'storeFile=release.jks\nstorePassword=%s\nkeyAlias=%s\nkeyPassword=%s\n' \
+            "$KEYSTORE_PASSWORD" "$KEY_ALIAS" "$KEY_PASSWORD" > "$dir/keystore.properties"
+          echo "PM_SIGNING_PROPS=$dir/keystore.properties" >> "$GITHUB_ENV"
+
+      - name: Throwaway key for pull requests
+        if: github.event_name == 'pull_request'
+        run: |
+          dir="$RUNNER_TEMP/signing"; mkdir -p "$dir"
+          keytool -genkeypair -keystore "$dir/release.jks" -storetype PKCS12 -alias ci -keyalg RSA \
+            -keysize 2048 -validity 1 -storepass cipass -keypass cipass -dname "CN=CI" -noprompt
+          printf 'storeFile=release.jks\nstorePassword=cipass\nkeyAlias=ci\nkeyPassword=cipass\n' > "$dir/keystore.properties"
+          echo "PM_SIGNING_PROPS=$dir/keystore.properties" >> "$GITHUB_ENV"
+
+      - name: Build
+        env:
+          ANDROID_SDK: ${{ runner.temp }}/sdk
+        run: |
+          ./build.sh
+          n=$(grep '^BUILD_NUMBER=' version.properties | cut -d= -f2 | tr -d ' ')
+          echo "VERSION=$(printf '0.1.%04d' "$((10#$n))")" >> "$GITHUB_ENV"
+          rm -f "$RUNNER_TEMP/signing/release.jks"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: DodiyPasswordManager-${{ env.VERSION }}
+          path: build/DodiyPasswordManager.apk
+
+      - name: Publish release (once per version)
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="v$VERSION"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            echo "Release $tag already exists; bump BUILD_NUMBER to publish a new one."
+          else
+            cp build/DodiyPasswordManager.apk "DodiyPasswordManager-$VERSION.apk"
+            gh release create "$tag" "DodiyPasswordManager-$VERSION.apk" --title "Dodiy Password Manager $VERSION" --target "$GITHUB_SHA" \
+              --notes "Signed with the release key; installs over earlier versions without uninstalling, and your saved logins are kept."
+          fi

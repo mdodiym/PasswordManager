@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:fillViewport="true" android:fitsSystemWindows="true" android:background="@color/bg">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="vertical" android:gravity="center_horizontal"
+        android:paddingStart="28dp" android:paddingEnd="28dp" android:paddingTop="48dp" android:paddingBottom="24dp">
+
+        <ImageView android:layout_width="96dp" android:layout_height="96dp"
+            android:src="@mipmap/ic_launcher" android:contentDescription="@string/app_name" />
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:layout_marginTop="16dp" android:text="@string/app_name" android:gravity="center"
+            android:textSize="24sp" android:textStyle="bold" android:textColor="@color/text" />
+        <TextView android:id="@+id/heading" android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:layout_marginTop="20dp" android:gravity="center"
+            android:textSize="18sp" android:textStyle="bold" android:textColor="@color/text" />
+        <TextView android:id="@+id/message" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="8dp" android:gravity="center" android:lineSpacingExtra="3dp"
+            android:textSize="15sp" android:textColor="@color/text2" />
+
+        <EditText android:id="@+id/password" style="@style/Field" android:layout_marginTop="24dp"
+            android:hint="Master password" android:inputType="textPassword" android:imeOptions="actionNext"
+            android:importantForAutofill="no" />
+        <EditText android:id="@+id/confirm" style="@style/Field" android:layout_marginTop="12dp"
+            android:hint="Type it again" android:inputType="textPassword" android:imeOptions="actionDone"
+            android:importantForAutofill="no" />
+        <CheckBox android:id="@+id/show" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="6dp" android:text="Show password" android:textColor="@color/text2" />
+        <TextView android:id="@+id/strength" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:textSize="13sp" android:textColor="@color/text2" />
+        <TextView android:id="@+id/error" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="8dp" android:gravity="center" android:textSize="14sp" android:textColor="@color/error" />
+
+        <ProgressBar android:id="@+id/progress" android:layout_width="36dp" android:layout_height="36dp"
+            android:layout_marginTop="12dp" android:visibility="gone" />
+        <TextView android:id="@+id/primary" style="@style/FilledButton" android:layout_marginTop="16dp" />
+        <TextView android:id="@+id/secondary" style="@style/TextButton" android:layout_marginTop="8dp" />
+
+        <Space android:layout_width="1dp" android:layout_height="0dp" android:layout_weight="1" />
+        <TextView android:id="@+id/reset" style="@style/TextButton" android:layout_marginTop="24dp"
+            android:text="Forgot master password? Reset vault" android:textSize="13sp" android:textColor="@color/text2" />
+        <TextView android:id="@+id/version" android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:textSize="12sp" android:textColor="@color/text2" />
+    </LinearLayout>
+</ScrollView>

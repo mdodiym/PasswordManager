@@ -1,0 +1,12 @@
+<resources>
+    <color name="bg">#FF111318</color>
+    <color name="card">#FF1D1F26</color>
+    <color name="text">#FFE3E2EA</color>
+    <color name="text2">#FFA9AAB7</color>
+    <color name="primary">#FFB9C3FF</color>
+    <color name="on_primary">#FF1B2678</color>
+    <color name="primary_container">#FF2F3B8F</color>
+    <color name="on_primary_container">#FFDDE1FF</color>
+    <color name="outline">#FF454752</color>
+    <color name="error">#FFFFB4AB</color>
+</resources>
