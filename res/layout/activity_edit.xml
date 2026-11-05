@@ -45,6 +45,10 @@
             <TextView style="@style/Label" android:text="Website (optional)" />
             <EditText android:id="@+id/url" style="@style/Field" android:inputType="textUri" android:hint="accounts.google.com"
                 android:importantForAutofill="no" />
+            <TextView style="@style/Label" android:text="More fields" />
+            <LinearLayout android:id="@+id/fieldsBox" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="vertical" />
+            <TextView android:id="@+id/addField" style="@style/TonalButton" android:text="＋  Add field (PIN, security question, 2FA …)" />
             <TextView style="@style/Label" android:text="Notes (optional)" />
             <EditText android:id="@+id/notes" style="@style/Field" android:layout_height="wrap_content" android:minHeight="96dp"
                 android:singleLine="false" android:gravity="top" android:paddingTop="12dp" android:paddingBottom="12dp"

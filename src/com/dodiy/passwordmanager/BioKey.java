@@ -13,13 +13,16 @@ import javax.crypto.spec.GCMParameterSpec;
 
 /**
  * AES key inside the Android Keystore (hardware backed where available). Every use needs a fresh
- * strong biometric (fingerprint, or face on phones where face counts as strong), so the vault
- * cannot be opened with the master password alone.
+ * strong biometric (fingerprint, or face on phones where face counts as strong). It wraps the vault
+ * key so a fingerprint alone can unlock the vault. Android deletes the key when fingerprints are
+ * added or removed; the master password still works then, and fingerprint unlock can be switched on again.
  */
 final class BioKey {
     private BioKey() {}
 
-    static final String ALIAS = "dodiy_pm_vault_bio_v1";
+    static final String ALIAS = "dodiy_pm_bio_v2";
+    /** Version 0.1.0002 needed fingerprint AND password; only used to move such vaults to the new format. */
+    static final String LEGACY_ALIAS = "dodiy_pm_vault_bio_v1";
 
     private static KeyStore store() throws Exception {
         KeyStore ks = KeyStore.getInstance("AndroidKeyStore");
@@ -34,7 +37,7 @@ final class BioKey {
                 .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
                 .setKeySize(256)
                 .setUserAuthenticationRequired(true)
-                .setInvalidatedByBiometricEnrollment(false);
+                .setInvalidatedByBiometricEnrollment(true);
         if (Build.VERSION.SDK_INT >= 30) {
             b.setUserAuthenticationParameters(0, KeyProperties.AUTH_BIOMETRIC_STRONG);
         }
@@ -43,8 +46,10 @@ final class BioKey {
         g.generateKey();
     }
 
-    static SecretKey key() throws Exception {
-        return (SecretKey) store().getKey(ALIAS, null);
+    static SecretKey key() throws Exception { return key(ALIAS); }
+
+    static SecretKey key(String alias) throws Exception {
+        return (SecretKey) store().getKey(alias, null);
     }
 
     static boolean exists() {
@@ -61,15 +66,19 @@ final class BioKey {
     }
 
     /** Cipher to decrypt with. Throws KeyPermanentlyInvalidatedException if Android wiped the key. */
-    static Cipher decryptCipher(byte[] iv) throws Exception {
-        SecretKey k = key();
+    static Cipher decryptCipher(byte[] iv) throws Exception { return decryptCipher(ALIAS, iv); }
+
+    static Cipher decryptCipher(String alias, byte[] iv) throws Exception {
+        SecretKey k = key(alias);
         if (k == null) throw new android.security.keystore.KeyPermanentlyInvalidatedException("Biometric key is missing");
         Cipher c = Cipher.getInstance("AES/GCM/NoPadding");
         c.init(Cipher.DECRYPT_MODE, k, new GCMParameterSpec(128, iv));
         return c;
     }
 
-    static void delete() {
-        try { store().deleteEntry(ALIAS); } catch (Exception ignored) {}
+    static void delete() { delete(ALIAS); }
+
+    static void delete(String alias) {
+        try { store().deleteEntry(alias); } catch (Exception ignored) {}
     }
 }

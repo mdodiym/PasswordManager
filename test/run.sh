@@ -10,5 +10,5 @@ rm -rf "$OUT"; mkdir -p "$OUT"
 CP="$JSON_JAR:$SDK/platforms/android-35/android.jar"
 javac -nowarn -encoding UTF-8 -d "$OUT" -cp "$CP" \
   "$ROOT/test/android/graphics/Path.java" "$ROOT/test/com/dodiy/passwordmanager/VaultTest.java" \
-  "$ROOT"/src/com/dodiy/passwordmanager/{Crypto,Entry,Vault,PasswordGen,PathData,Session,BioKey}.java
+  "$ROOT"/src/com/dodiy/passwordmanager/{Crypto,Entry,Field,FieldCatalog,Totp,Vault,PasswordGen,PathData,Session,BioKey}.java
 java -cp "$OUT:$CP" com.dodiy.passwordmanager.VaultTest "$ROOT/assets/providers.txt"

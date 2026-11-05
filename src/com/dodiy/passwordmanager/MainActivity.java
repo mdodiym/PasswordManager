@@ -110,6 +110,7 @@ public final class MainActivity extends BaseActivity {
         m.add(0, 2, 0, "All provider logos");
         m.add(0, 3, 0, "Export encrypted backup");
         m.add(0, 4, 0, "Restore from backup");
+        m.add(0, 8, 0, Vault.bioEnabled(this) ? "Fingerprint unlock: On (tap to turn off)" : "Fingerprint unlock: Off (tap to turn on)");
         m.add(0, 5, 0, "Change master password");
         m.add(0, 6, 0, "Lock now");
         m.add(0, 7, 0, "About");
@@ -123,6 +124,7 @@ public final class MainActivity extends BaseActivity {
                     case 5: changePassword(); return true;
                     case 6: lockNow(); return true;
                     case 7: about(); return true;
+                    case 8: toggleBio(); return true;
                 }
                 return false;
             }
@@ -134,7 +136,7 @@ public final class MainActivity extends BaseActivity {
         new AlertDialog.Builder(this)
                 .setTitle(getString(R.string.app_name))
                 .setMessage(Ui.version(this) + "\n\n"
-                        + "Your passwords are stored only on this phone, encrypted with AES-256. Opening the vault needs both your fingerprint (Android Keystore) and your master password.\n\n"
+                        + "Your logins are stored only on this phone, encrypted with AES-256. The vault opens with your master password, or with your fingerprint if you turned that on (the key for it lives in the Android Keystore).\n\n"
                         + "The vault locks as soon as you leave the app, screenshots are blocked, and copied passwords are cleared from the clipboard after 45 seconds.\n\n"
                         + Providers.all(this).size() + " provider logos are included. Brand logos from Simple Icons (CC0); they are trademarks of their owners.")
                 .setPositiveButton("OK", null).show();
@@ -229,7 +231,7 @@ public final class MainActivity extends BaseActivity {
                             }
                             @Override void done(Boolean ok, Exception e) {
                                 if (ok == null || !ok) { Ui.toast(MainActivity.this, "Current master password is wrong. Nothing changed."); return; }
-                                confirmFingerprintAndChange(n);
+                                saveNewPassword(n);
                             }
                         }.run(MainActivity.this);
                     }
@@ -239,24 +241,52 @@ public final class MainActivity extends BaseActivity {
         d.show();
     }
 
-    private void confirmFingerprintAndChange(final String newPassword) {
+    private void saveNewPassword(final String newPassword) {
+        new Ui.Task<Void>() {
+            @Override Void work() throws Exception {
+                char[] ch = newPassword.toCharArray();
+                try { Vault.changePassword(MainActivity.this, ch); } finally { Crypto.wipe(ch); }
+                return null;
+            }
+            @Override void done(Void r, Exception e) {
+                Ui.toast(MainActivity.this, e == null ? "Master password changed" : "Not changed: " + e.getMessage());
+            }
+        }.run(this);
+    }
+
+    // ---- fingerprint unlock on / off -------------------------------------------------------------
+
+    private void toggleBio() {
+        if (Vault.bioEnabled(this)) {
+            Ui.confirm(this, "Turn off fingerprint unlock?", "You will need your master password to open the vault.", "Turn off", new Runnable() {
+                @Override public void run() {
+                    try {
+                        Vault.disableBio(MainActivity.this);
+                        Prefs.setBioDeclined(MainActivity.this, true);
+                        Ui.toast(MainActivity.this, "Fingerprint unlock is off");
+                    } catch (Exception e) {
+                        Ui.toast(MainActivity.this, "Could not change it: " + e.getMessage());
+                    }
+                }
+            });
+            return;
+        }
+        String why = Bio.unavailableReason(this);
+        if (why != null) { Ui.toast(this, why); return; }
         Cipher c;
-        try { c = BioKey.encryptCipher(); } catch (Exception e) { Ui.toast(this, "Fingerprint key problem: " + e.getMessage()); return; }
-        Bio.prompt(this, "Confirm new master password", "Fingerprint needed to save the change", c, new Bio.Callback() {
-            @Override public void onSuccess(final Cipher cipher) {
-                new Ui.Task<Void>() {
-                    @Override Void work() throws Exception {
-                        char[] ch = newPassword.toCharArray();
-                        try { Vault.changePassword(MainActivity.this, ch, cipher); } finally { Crypto.wipe(ch); }
-                        return null;
-                    }
-                    @Override void done(Void r, Exception e) {
-                        Ui.toast(MainActivity.this, e == null ? "Master password changed" : "Not changed: " + e.getMessage());
-                    }
-                }.run(MainActivity.this);
+        try { c = Vault.prepareEnableBio(); } catch (Exception e) { Ui.toast(this, "Could not set it up: " + e.getMessage()); return; }
+        Bio.prompt(this, "Turn on fingerprint unlock", "Confirm with your fingerprint", c, new Bio.Callback() {
+            @Override public void onSuccess(Cipher cipher) {
+                try {
+                    Vault.enableBio(MainActivity.this, cipher);
+                    Prefs.setBioDeclined(MainActivity.this, false);
+                    Ui.toast(MainActivity.this, "Fingerprint unlock is on");
+                } catch (Exception e) {
+                    Ui.toast(MainActivity.this, "Could not turn it on: " + e.getMessage());
+                }
             }
             @Override public void onError(CharSequence msg, boolean cancelled) {
-                Ui.toast(MainActivity.this, "Not changed" + (cancelled ? "" : ": " + msg));
+                if (!cancelled) Ui.toast(MainActivity.this, msg);
             }
         });
     }

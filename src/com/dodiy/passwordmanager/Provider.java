@@ -7,13 +7,16 @@ final class Provider {
     static final int GLYPH = 0;      // single-colour logo path (Simple Icons)
     static final int LETTERS = 1;    // brand-coloured badge with letters (brand not in Simple Icons)
     static final int MICROSOFT = 2;  // four coloured squares, drawn by hand
+    static final int IMAGE = 3;      // downloaded app icon, assets/logos/<slug>.png
 
     final String slug;
     final String title;
     final int color;
     final String aliases;
     final int kind;
-    final String data;   // path data for GLYPH, letters for LETTERS
+    final String data;   // path data for GLYPH, letters for LETTERS, asset path for IMAGE
+    String category = "";  // e.g. "Bank" for Malaysian providers
+    android.graphics.Bitmap bitmap;
     private Path path;
     final String key;    // lower-case search key
     final String normTitle;

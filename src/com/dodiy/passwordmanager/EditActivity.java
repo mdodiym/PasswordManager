@@ -20,6 +20,7 @@ public final class EditActivity extends BaseActivity {
     private EditText title, username, password, url, notes;
     private ImageView logo;
     private TextView providerName;
+    private FieldEditor fieldEditor;
 
     @Override protected void onCreate(Bundle b) {
         super.onCreate(b);
@@ -58,6 +59,11 @@ public final class EditActivity extends BaseActivity {
             }
         }
         bindLogo();
+        fieldEditor = new FieldEditor(this, (android.widget.LinearLayout) findViewById(R.id.fieldsBox),
+                original != null ? original.fields : new java.util.ArrayList<Field>());
+        findViewById(R.id.addField).setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) { fieldEditor.showPicker(); }
+        });
 
         title.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int a, int c, int d) {}
@@ -145,6 +151,7 @@ public final class EditActivity extends BaseActivity {
         e.password = password.getText().toString();
         e.url = url.getText().toString().trim();
         e.notes = notes.getText().toString();
+        e.fields = fieldEditor.result();
         e.updated = System.currentTimeMillis();
         if (original == null) Session.entries.add(e);
         if (persist()) {
@@ -170,14 +177,26 @@ public final class EditActivity extends BaseActivity {
 
     private boolean changed() {
         if (original == null) {
-            return title.length() + username.length() + password.length() + url.length() + notes.length() > 0;
+            return title.length() + username.length() + password.length() + url.length() + notes.length() > 0
+                    || !fieldEditor.result().isEmpty();
         }
         return !original.title.equals(title.getText().toString().trim())
                 || !original.username.equals(username.getText().toString().trim())
                 || !original.password.equals(password.getText().toString())
                 || !original.url.equals(url.getText().toString().trim())
                 || !original.notes.equals(notes.getText().toString())
-                || !original.provider.equals(provider);
+                || !original.provider.equals(provider)
+                || fieldsChanged();
+    }
+
+    private boolean fieldsChanged() {
+        java.util.ArrayList<Field> now = fieldEditor.result();
+        if (now.size() != original.fields.size()) return true;
+        for (int i = 0; i < now.size(); i++) {
+            Field a = now.get(i), b = original.fields.get(i);
+            if (!a.label.equals(b.label) || !a.value.equals(b.value) || !a.type.equals(b.type)) return true;
+        }
+        return false;
     }
 
     @Override public void onBackPressed() {

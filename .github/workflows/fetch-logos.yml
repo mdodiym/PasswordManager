@@ -1,0 +1,30 @@
+name: Fetch provider logos
+
+# Downloads Malaysian bank / provider icons (assets/malaysia.tsv) into assets/logos and commits them back.
+on:
+  push:
+    branches: ['tools/fetch-logos']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fetch:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install pillow cairosvg
+      - if: hashFiles('assets/logos/*.png') == ''
+        run: python3 tools/fetch_logos.py assets/malaysia.tsv assets/logos tools/logo-report.json tools/logo-sheet.png
+      - run: python3 tools/fetch_appstore_icons.py assets/malaysia.tsv assets/logos tools/appstore-report.json tools/appstore-sheet.png
+      - name: Commit logos
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/logos tools/*.json tools/*.png
+          git commit -m "Fetched provider logos" || echo "nothing new"
+          git push
