@@ -1,0 +1,138 @@
+{
+ "publicbank": {
+  "ok": true,
+  "app": "MyPB by Public Bank",
+  "seller": "Public Bank Berhad",
+  "url": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/ad/2f/2e/ad2f2eb6-fc81-724f-82a8-d48360657e5b/AppIcon-0-1x_U007emarketing-0-11-0-85-220-0.png/512x512bb.jpg",
+  "mode": "full"
+ },
+ "hongleongbank": {
+  "ok": true,
+  "app": "HLB Connect Mobile Banking App",
+  "seller": "Hong Leong Bank Berhad",
+  "url": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/92/8a/35/928a3552-bffa-3ad6-c05b-9f57788ef9a2/AppIcon-0-0-1x_U007emarketing-0-11-0-sRGB-85-220.png/512x512bb.jpg",
+  "mode": "full"
+ },
+ "bsn": {
+  "ok": true,
+  "app": "myBSN",
+  "seller": "Bank Simpanan Nasional",
+  "url": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/a9/e3/d5/a9e3d5d0-4ff7-a5ea-52dc-cd5c4557d289/AppIcon-0-0-1x_U007emarketing-0-8-0-85-220.png/512x512bb.jpg",
+  "mode": "full"
+ },
+ "uobmalaysia": {
+  "ok": true,
+  "app": "UOB TMRW Malaysia",
+  "seller": "United Overseas Bank Limited Co.",
+  "url": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/cc/ad/3a/ccad3a11-23b3-cf75-a269-66d8c45529f3/AppIcon-0-0-1x_U007emarketing-0-4-0-85-220.png/512x512bb.jpg",
+  "mode": "full"
+ },
+ "agrobank": {
+  "ok": true,
+  "app": "AGRONet Mobile",
+  "seller": "BANK PERTANIAN MALAYSIA BERHAD",
+  "url": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/81/29/b3/8129b360-5a57-96d9-1176-0ebae644f178/AppIcon-0-0-1x_U007emarketing-0-8-0-85-220.png/512x512bb.jpg",
+  "mode": "full"
+ },
+ "mbsb": {
+  "ok": true,
+  "app": "MBSB Bank Mobile Banking",
+  "seller": "MBSB Bank Berhad",
+  "url": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/31/0b/c7/310bc7c6-850d-9e1e-65ed-ba35b3d56ee8/AppIcon-0-0-1x_U007epad-0-9-0-0-85-220.png/512x512bb.jpg",
+  "mode": "full"
+ },
+ "bigpay": {
+  "ok": true,
+  "app": "BigPay \u2013 financial services",
+  "seller": "BIG PAY PTE. LTD.",
+  "url": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/0a/7e/bf/0a7ebfea-6666-8e47-e23f-72044627608c/AppIcon-0-0-1x_U007ephone-0-1-85-220.png/512x512bb.jpg",
+  "mode": "full"
+ },
+ "kwsp": {
+  "ok": true,
+  "app": "KWSP i-Akaun",
+  "seller": "Kumpulan Wang Simpanan Pekerja (KWSP)",
+  "url": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/0f/33/ea/0f33ea38-6982-24e2-30e2-fe855fe173fd/AppIcon-0-0-1x_U007emarketing-0-11-0-85-220.png/512x512bb.jpg",
+  "mode": "full"
+ },
+ "perkeso": {
+  "ok": false
+ },
+ "myeg": {
+  "ok": true,
+  "app": "MyEG",
+  "seller": "My E.G. Services Berhad",
+  "url": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/ee/b2/30/eeb230a5-4e9e-2383-cf89-68aa52005529/PRODAppIcon-0-0-1x_U007emarketing-0-8-0-85-220.png/512x512bb.jpg",
+  "mode": "full"
+ },
+ "mysejahtera": {
+  "ok": true,
+  "app": "MySejahtera",
+  "seller": "JABATAN DIGITAL NEGARA (JDN)",
+  "url": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/4c/ba/98/4cba9824-cbe8-a1cc-acc4-924d6ddeb56b/AppIcon-0-0-1x_U007emarketing-0-11-0-85-220.png/512x512bb.jpg",
+  "mode": "full"
+ },
+ "ssm": {
+  "ok": true,
+  "app": "MySSM",
+  "seller": "Suruhanjaya Syarikat Malaysia",
+  "url": "https://is1-ssl.mzstatic.com/image/thumb/Purple126/v4/2d/53/44/2d53441c-d91c-3a76-d15d-dbbfe963bfcd/AppIcon-0-0-1x_U007emarketing-0-0-0-10-0-0-sRGB-0-0-0-GLES2_U002c0-512MB-85-220-0-0.png/512x512bb.jpg",
+  "mode": "full"
+ },
+ "tabunghaji": {
+  "ok": true,
+  "app": "Tabung Haji",
+  "seller": "Lembaga Tabung Haji",
+  "url": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/19/5b/a4/195ba4a0-fb99-3039-b6a0-c6aa55375620/AppIcon-0-0-1x_U007emarketing-0-11-0-85-220.png/512x512bb.jpg",
+  "mode": "full"
+ },
+ "bnm": {
+  "ok": true,
+  "app": "BNM Mobile ID",
+  "seller": "Bank Negara Malaysia",
+  "url": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/b9/5c/69/b95c69a8-554c-8397-6b36-1b7e86b4509b/AppIcon-0-0-1x_U007emarketing-0-8-0-85-220.png/512x512bb.jpg",
+  "mode": "full"
+ },
+ "pdrm": {
+  "ok": true,
+  "app": "MyBayar PDRM",
+  "seller": "Royal Malaysia Police",
+  "url": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/d5/34/04/d53404b2-0fdb-76df-84fb-b4ad7dfe1eb5/AppIcon-1x_U007emarketing-0-11-0-85-220-0.png/512x512bb.jpg",
+  "mode": "full"
+ },
+ "tnb": {
+  "ok": true,
+  "app": "myTNB",
+  "seller": "Tenaga Nasional Berhad",
+  "url": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/49/43/2f/49432ffa-1361-391b-265c-8bcd73d3361c/appicon-0-0-1x_U007emarketing-0-8-0-85-220.png/512x512bb.jpg",
+  "mode": "full"
+ },
+ "indahwater": {
+  "ok": true,
+  "app": "Indah Water",
+  "seller": "Indah Water Konsortium Sdn Bhd",
+  "url": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/38/67/cd/3867cd16-578b-5772-2cd5-f03f2a0a07dc/appicon-0-0-1x_U007emarketing-0-8-0-85-220.png/512x512bb.jpg",
+  "mode": "full"
+ },
+ "ktmb": {
+  "ok": true,
+  "app": "KTMB Mobile",
+  "seller": "Keretapi Tanah Melayu Berhad",
+  "url": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/e8/a6/45/e8a6455f-a01a-50dd-c08e-a8348f044ef8/AppIcon-0-0-1x_U007emarketing-0-8-0-85-220.png/512x512bb.jpg",
+  "mode": "full"
+ },
+ "mydin": {
+  "ok": true,
+  "app": "MYDIN REWARDS",
+  "seller": "Mydin Wholesale Emporium Sdn Bhd",
+  "url": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/c9/14/cb/c914cbbb-0ccd-e334-e5f4-844dd76a1096/AppIcon-0-0-1x_U007emarketing-0-6-0-85-220.png/512x512bb.jpg",
+  "mode": "full"
+ },
+ "tealive": {
+  "ok": true,
+  "app": "Tealive MY - Order Bubble Tea",
+  "seller": "Loob Holding Sdn Bhd",
+  "url": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/c0/8f/24/c08f24dd-de0d-b2d8-49ca-6bbb7a089869/tealive_my_prodAppIcon-0-0-1x_U007emarketing-0-8-0-85-220.png/512x512bb.jpg",
+  "mode": "full"
+ }
+}
