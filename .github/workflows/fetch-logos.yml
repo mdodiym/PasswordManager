@@ -18,11 +18,13 @@ jobs:
         with:
           python-version: '3.12'
       - run: pip install pillow cairosvg
-      - run: python3 tools/fetch_logos.py tools/malaysia.tsv assets/logos tools/logo-report.json tools/logo-sheet.png
+      - if: hashFiles('assets/logos/*.png') == ''
+        run: python3 tools/fetch_logos.py tools/malaysia.tsv assets/logos tools/logo-report.json tools/logo-sheet.png
+      - run: python3 tools/fetch_appstore_icons.py tools/malaysia.tsv assets/logos tools/appstore-report.json tools/appstore-sheet.png
       - name: Commit logos
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add assets/logos tools/logo-report.json tools/logo-sheet.png
+          git add assets/logos tools/*.json tools/*.png
           git commit -m "Fetched provider logos" || echo "nothing new"
           git push
