@@ -1,0 +1,862 @@
+{
+ "maybank": {
+  "ok": true,
+  "source": "site:0",
+  "url": "https://www.maybank2u.com.my/static/img/favicon.ico",
+  "size": [
+   32,
+   32
+  ],
+  "mode": "padded"
+ },
+ "cimb": {
+  "ok": true,
+  "source": "site:652",
+  "url": "https://www.cimb.com.my/content/dam/cimb/favicon/apple-touch-icon-152x152.png",
+  "size": [
+   152,
+   152
+  ],
+  "mode": "padded"
+ },
+ "publicbank": {
+  "ok": false
+ },
+ "rhb": {
+  "ok": true,
+  "source": "site:0",
+  "url": "https://www.rhbgroup.com/-/media/Assets/Corporate-Website/Images/vector/rhb_logo_diamond.png",
+  "size": [
+   594,
+   593
+  ],
+  "mode": "padded"
+ },
+ "hongleongbank": {
+  "ok": false
+ },
+ "ambank": {
+  "ok": true,
+  "source": "site:0",
+  "url": "https://www.ambank.com.my/assets/safari-pinned-tab.svg",
+  "size": [
+   256,
+   256
+  ],
+  "mode": "padded"
+ },
+ "bankislam": {
+  "ok": true,
+  "source": "google",
+  "url": "https://www.google.com/s2/favicons?domain=bankislam.com&sz=256",
+  "size": [
+   192,
+   192
+  ],
+  "mode": "padded"
+ },
+ "bankrakyat": {
+  "ok": true,
+  "source": "site:0",
+  "url": "https://www.bankrakyat.com.my/uploads/favicon_20261013194321.png",
+  "size": [
+   144,
+   144
+  ],
+  "mode": "full"
+ },
+ "bsn": {
+  "ok": false
+ },
+ "affinbank": {
+  "ok": true,
+  "source": "site:680",
+  "url": "https://www.affinalways.com/img/icons/180x180.png",
+  "size": [
+   180,
+   180
+  ],
+  "mode": "full"
+ },
+ "alliancebank": {
+  "ok": true,
+  "source": "site:0",
+  "url": "https://www.alliancebank.com.my/Alliance/media/master/image/favicon.ico",
+  "size": [
+   48,
+   48
+  ],
+  "mode": "padded"
+ },
+ "bankmuamalat": {
+  "ok": true,
+  "source": "site:192",
+  "url": "https://www.muamalat.com.my/wp-content/uploads/2023/12/cropped-Bank-Muamalat-Favicon-192x192.jpg",
+  "size": [
+   192,
+   192
+  ],
+  "mode": "full"
+ },
+ "ocbcmalaysia": {
+  "ok": true,
+  "source": "google",
+  "url": "https://www.google.com/s2/favicons?domain=ocbc.com.my&sz=256",
+  "size": [
+   192,
+   192
+  ],
+  "mode": "padded"
+ },
+ "uobmalaysia": {
+  "ok": false
+ },
+ "hsbcmalaysia": {
+  "ok": true,
+  "source": "site:0",
+  "url": "https://www.hsbc.com.my/etc.clientlibs/dpws/clientlibs-public/clientlib-site/resources/favicons/safari-pinned-tab.svg",
+  "size": [
+   256,
+   256
+  ],
+  "mode": "padded"
+ },
+ "standardchartered": {
+  "ok": true,
+  "source": "site:0",
+  "url": "http://www.standardchartered.com/favicon.ico",
+  "size": [
+   32,
+   32
+  ],
+  "mode": "padded"
+ },
+ "agrobank": {
+  "ok": false
+ },
+ "alrajhi": {
+  "ok": true,
+  "source": "google",
+  "url": "https://www.google.com/s2/favicons?domain=alrajhibank.com.my&sz=256",
+  "size": [
+   180,
+   180
+  ],
+  "mode": "full"
+ },
+ "mbsb": {
+  "ok": false
+ },
+ "gxbank": {
+  "ok": true,
+  "source": "site:500",
+  "url": "https://www.gxbank.my/images/webclip.png",
+  "size": [
+   256,
+   256
+  ],
+  "mode": "padded"
+ },
+ "boostbank": {
+  "ok": true,
+  "source": "site:0",
+  "url": "https://myboostbank.co/themes/custom/boost_web/favicon.ico",
+  "size": [
+   32,
+   32
+  ],
+  "mode": "padded"
+ },
+ "aeonbank": {
+  "ok": true,
+  "source": "google",
+  "url": "https://www.google.com/s2/favicons?domain=aeonbank.com.my&sz=256",
+  "size": [
+   75,
+   75
+  ],
+  "mode": "padded"
+ },
+ "touchngo": {
+  "ok": true,
+  "source": "site:500",
+  "url": "https://www.touchngo.com.my/images/webclip.gif",
+  "size": [
+   256,
+   256
+  ],
+  "mode": "padded"
+ },
+ "boostmy": {
+  "ok": true,
+  "source": "site:0",
+  "url": "https://myboost.co/themes/custom/boost_web/favicon.ico",
+  "size": [
+   32,
+   32
+  ],
+  "mode": "padded"
+ },
+ "bigpay": {
+  "ok": false
+ },
+ "setel": {
+  "ok": true,
+  "source": "site:500",
+  "url": "https://www.setel.com/wp-content/uploads/2025/10/favicon-300x300.png",
+  "size": [
+   300,
+   300
+  ],
+  "mode": "padded"
+ },
+ "duitnow": {
+  "ok": true,
+  "source": "site:0",
+  "url": "https://paynet.my/_app/immutable/assets/favicon.D-KKk-gs.svg",
+  "size": [
+   256,
+   256
+  ],
+  "mode": "padded"
+ },
+ "paynet": {
+  "ok": true,
+  "source": "site:0",
+  "url": "https://paynet.my/_app/immutable/assets/favicon.D-KKk-gs.svg",
+  "size": [
+   256,
+   256
+  ],
+  "mode": "padded"
+ },
+ "maxis": {
+  "ok": true,
+  "source": "site:192",
+  "url": "https://www.maxis.com.my/content/dam/mxs/images/favicons/android-chrome-192x192.png",
+  "size": [
+   192,
+   192
+  ],
+  "mode": "padded"
+ },
+ "celcomdigi": {
+  "ok": true,
+  "source": "google",
+  "url": "https://www.google.com/s2/favicons?domain=celcomdigi.com&sz=256",
+  "size": [
+   256,
+   256
+  ],
+  "mode": "full"
+ },
+ "umobile": {
+  "ok": true,
+  "source": "site:0",
+  "url": "https://www.u.com.my/img/personal-favicon-32x32.png?v=_T65dOXqLfEJ0RsGsixuok9LzXvh7TPrs6VGW0wuxqw",
+  "size": [
+   32,
+   32
+  ],
+  "mode": "padded"
+ },
+ "unifi": {
+  "ok": true,
+  "source": "site:0",
+  "url": "https://unifi.com.my/themes/unifi/favicon.ico",
+  "size": [
+   48,
+   48
+  ],
+  "mode": "padded"
+ },
+ "tm": {
+  "ok": true,
+  "source": "site:0",
+  "url": "https://www.tm.com.my/sites/default/files/favicon.ico",
+  "size": [
+   48,
+   48
+  ],
+  "mode": "padded"
+ },
+ "yes": {
+  "ok": true,
+  "source": "site:500",
+  "url": "https://cdn.yes.my/site/wp-content/uploads/2023/09/yes-favicon-v2.png",
+  "size": [
+   52,
+   54
+  ],
+  "mode": "padded"
+ },
+ "timedotcom": {
+  "ok": true,
+  "source": "google",
+  "url": "https://www.google.com/s2/favicons?domain=time.com.my&sz=256",
+  "size": [
+   98,
+   97
+  ],
+  "mode": "padded"
+ },
+ "redone": {
+  "ok": true,
+  "source": "site:500",
+  "url": "https://www.redonemobile.com.my/wp-content/uploads/2022/03/favicon.ico",
+  "size": [
+   64,
+   64
+  ],
+  "mode": "padded"
+ },
+ "tunetalk": {
+  "ok": true,
+  "source": "site:500",
+  "url": "https://cdn.tunetalk.com/wp-content/uploads/2022/02/11145345/tt-logo-eclipse-5g-300x300.png",
+  "size": [
+   300,
+   300
+  ],
+  "mode": "padded"
+ },
+ "xox": {
+  "ok": true,
+  "source": "site:0",
+  "url": "https://xox.com.my/favicon.ico",
+  "size": [
+   256,
+   256
+  ],
+  "mode": "padded"
+ },
+ "astromalaysia": {
+  "ok": true,
+  "source": "site:96",
+  "url": "https://www.astro.com.my/icon.ico?icon.053p5zu02p7rh.ico",
+  "size": [
+   96,
+   96
+  ],
+  "mode": "full"
+ },
+ "mygov": {
+  "ok": true,
+  "source": "site:680",
+  "url": "https://www.malaysia.gov.my/apple-icon.png?apple-icon.38ovlv_ie6wep.png",
+  "size": [
+   180,
+   180
+  ],
+  "mode": "full"
+ },
+ "mydigitalid": {
+  "ok": true,
+  "source": "site:0",
+  "url": "https://www.mydigital.gov.my/wp-content/uploads/2021/11/MyDIGITAL_Logo-with-R-trademark-1.png",
+  "size": [
+   800,
+   894
+  ],
+  "mode": "padded"
+ },
+ "lhdn": {
+  "ok": true,
+  "source": "site:500",
+  "url": "https://www.hasil.gov.my/wp-content/uploads/logo-512px-300x300.png",
+  "size": [
+   300,
+   300
+  ],
+  "mode": "padded"
+ },
+ "kwsp": {
+  "ok": false
+ },
+ "perkeso": {
+  "ok": false
+ },
+ "jpj": {
+  "ok": true,
+  "source": "site:500",
+  "url": "https://www.jpj.gov.my/wp-content/uploads/2024/01/JPJLogo.png",
+  "size": [
+   215,
+   215
+  ],
+  "mode": "padded"
+ },
+ "myeg": {
+  "ok": false
+ },
+ "mysejahtera": {
+  "ok": false
+ },
+ "imigresen": {
+  "ok": true,
+  "source": "site:192",
+  "url": "https://www.imi.gov.my/wp-content/uploads/2021/06/favicon.ico",
+  "size": [
+   64,
+   64
+  ],
+  "mode": "padded"
+ },
+ "ptptn": {
+  "ok": true,
+  "source": "site:192",
+  "url": "https://www.ptptn.gov.my/wp-content/uploads/2022/03/cropped-favicon-v3-01-192x192.png",
+  "size": [
+   192,
+   192
+  ],
+  "mode": "padded"
+ },
+ "ssm": {
+  "ok": false
+ },
+ "tabunghaji": {
+  "ok": false
+ },
+ "asnb": {
+  "ok": true,
+  "source": "apple-touch-icon",
+  "url": "https://www.asnb.com.my/apple-touch-icon.png",
+  "size": [
+   180,
+   180
+  ],
+  "mode": "full"
+ },
+ "bnm": {
+  "ok": false
+ },
+ "bursamalaysia": {
+  "ok": true,
+  "source": "google",
+  "url": "https://www.google.com/s2/favicons?domain=bursamalaysia.com&sz=256",
+  "size": [
+   180,
+   180
+  ],
+  "mode": "padded"
+ },
+ "pdrm": {
+  "ok": false
+ },
+ "tnb": {
+  "ok": false
+ },
+ "airselangor": {
+  "ok": true,
+  "source": "site:389",
+  "url": "https://www.airselangor.com/icon.ico?a0b34959406e61eb",
+  "size": [
+   389,
+   389
+  ],
+  "mode": "padded"
+ },
+ "indahwater": {
+  "ok": false
+ },
+ "malaysiaairlines": {
+  "ok": true,
+  "source": "site:0",
+  "url": "https://www.malaysiaairlines.com/etc.clientlibs/mh/clientlibs/clientlib-vue/resources/favicon.ico",
+  "size": [
+   64,
+   64
+  ],
+  "mode": "padded"
+ },
+ "batikair": {
+  "ok": true,
+  "source": "google",
+  "url": "https://www.google.com/s2/favicons?domain=batikair.com&sz=256",
+  "size": [
+   64,
+   64
+  ],
+  "mode": "padded"
+ },
+ "firefly": {
+  "ok": true,
+  "source": "google",
+  "url": "https://www.google.com/s2/favicons?domain=fireflyz.com.my&sz=256",
+  "size": [
+   32,
+   32
+  ],
+  "mode": "padded"
+ },
+ "ktmb": {
+  "ok": false
+ },
+ "myrapid": {
+  "ok": true,
+  "source": "site:192",
+  "url": "https://myrapid.com.my/wp-content/uploads/2020/12/cropped-myrapid_site_favicon-192x192.png",
+  "size": [
+   192,
+   192
+  ],
+  "mode": "padded"
+ },
+ "plus": {
+  "ok": true,
+  "source": "site:192",
+  "url": "https://www.plus.com.my/wp-content/uploads/2024/02/cropped-1200px-plus-expressways-logo.svg-695x332-removebg-preview-192x192.png",
+  "size": [
+   192,
+   192
+  ],
+  "mode": "padded"
+ },
+ "petronas": {
+  "ok": true,
+  "source": "site:0",
+  "url": "https://www.petronas.com/assets/favicon.png",
+  "size": [
+   32,
+   32
+  ],
+  "mode": "padded"
+ },
+ "shellmy": {
+  "ok": true,
+  "source": "site:0",
+  "url": "https://www.shell.com.my/etc.clientlibs/amidala/clientlibs/theme-base/resources/favicon/favicon.svg",
+  "size": [
+   256,
+   256
+  ],
+  "mode": "padded"
+ },
+ "petron": {
+  "ok": true,
+  "source": "site:500",
+  "url": "https://www.petron.com.my/wp-content/uploads/2018/01/petron-70.png",
+  "size": [
+   70,
+   85
+  ],
+  "mode": "padded"
+ },
+ "bhpetrol": {
+  "ok": true,
+  "source": "site:500",
+  "url": "https://www.bhpetrol.com.my/wp-content/uploads/2021/03/favicon-300x300.png",
+  "size": [
+   300,
+   300
+  ],
+  "mode": "padded"
+ },
+ "shopeemy": {
+  "ok": true,
+  "source": "site:500",
+  "url": "https://deo.shopeemobile.com/shopee/shopee-mobilemall-live-sg/assets/ios_icon_180x180.350d4cdc7ba40b87541691005bda74c5.png",
+  "size": [
+   180,
+   180
+  ],
+  "mode": "full"
+ },
+ "lazada": {
+  "ok": true,
+  "source": "site:0",
+  "url": "https://www.lazada.com.my/favicon.ico",
+  "size": [
+   128,
+   128
+  ],
+  "mode": "full"
+ },
+ "zalora": {
+  "ok": true,
+  "source": "google",
+  "url": "https://www.google.com/s2/favicons?domain=zalora.com.my&sz=256",
+  "size": [
+   180,
+   180
+  ],
+  "mode": "full"
+ },
+ "mrdiy": {
+  "ok": true,
+  "source": "site:0",
+  "url": "https://www.mrdiy.com/public/files/1f2bdea4d33ae63835f985cc3b06f8a0a5010f80782016163e6d64a297577bd4.png",
+  "size": [
+   256,
+   256
+  ],
+  "mode": "padded"
+ },
+ "lotuss": {
+  "ok": true,
+  "source": "site:680",
+  "url": "https://www.lotuss.com.my/favicon.png",
+  "size": [
+   512,
+   512
+  ],
+  "mode": "padded"
+ },
+ "aeonmy": {
+  "ok": true,
+  "source": "site:680",
+  "url": "https://aeonretail.com.my/wp-content/uploads/2023/06/27461660.jpg",
+  "size": [
+   50,
+   50
+  ],
+  "mode": "full"
+ },
+ "mydin": {
+  "ok": false
+ },
+ "pgmall": {
+  "ok": true,
+  "source": "apple-touch-icon",
+  "url": "https://www.pgmall.my/apple-touch-icon.png",
+  "size": [
+   180,
+   180
+  ],
+  "mode": "padded"
+ },
+ "watsonsmy": {
+  "ok": true,
+  "source": "site:596",
+  "url": "https://www.watsons.com.my/assets/icons/watsonsfavico.png",
+  "size": [
+   96,
+   96
+  ],
+  "mode": "padded"
+ },
+ "guardianmy": {
+  "ok": true,
+  "source": "site:500",
+  "url": "https://guardian.com.my/venia-static/icons/icon-256x256.png",
+  "size": [
+   256,
+   256
+  ],
+  "mode": "full"
+ },
+ "foodpandamy": {
+  "ok": true,
+  "source": "site:192",
+  "url": "https://micro-assets.foodora.com/favicons/fp/android-chrome-192x192.png",
+  "size": [
+   192,
+   192
+  ],
+  "mode": "padded"
+ },
+ "zuscoffee": {
+  "ok": true,
+  "source": "site:500",
+  "url": "https://zuscoffee.com/wp-content/uploads/2025/07/app-logo-resize-256x256-1.png",
+  "size": [
+   256,
+   256
+  ],
+  "mode": "padded"
+ },
+ "tealive": {
+  "ok": false
+ },
+ "mudah": {
+  "ok": true,
+  "source": "site:680",
+  "url": "https://mcdn.mudah.my/static-assets/images/olympus/apple-touch-icon-v2.png",
+  "size": [
+   180,
+   180
+  ],
+  "mode": "full"
+ },
+ "carousell": {
+  "ok": true,
+  "source": "google",
+  "url": "https://www.google.com/s2/favicons?domain=carousell.com.my&sz=256",
+  "size": [
+   180,
+   180
+  ],
+  "mode": "full"
+ },
+ "jobstreet": {
+  "ok": true,
+  "source": "google",
+  "url": "https://www.google.com/s2/favicons?domain=jobstreet.com.my&sz=256",
+  "size": [
+   256,
+   256
+  ],
+  "mode": "full"
+ },
+ "hiredly": {
+  "ok": true,
+  "source": "site:0",
+  "url": "https://assets.wobbjobs.com/images/hiredly/hiredly-favicon.png",
+  "size": [
+   32,
+   32
+  ],
+  "mode": "padded"
+ },
+ "iproperty": {
+  "ok": true,
+  "source": "google",
+  "url": "https://www.google.com/s2/favicons?domain=iproperty.com.my&sz=256",
+  "size": [
+   256,
+   256
+  ],
+  "mode": "full"
+ },
+ "propertyguru": {
+  "ok": true,
+  "source": "google",
+  "url": "https://www.google.com/s2/favicons?domain=propertyguru.com.my&sz=256",
+  "size": [
+   256,
+   256
+  ],
+  "mode": "full"
+ },
+ "greateastern": {
+  "ok": true,
+  "source": "site:0",
+  "url": "https://www.greateasternlife.com/content/dam/corp-site/ge-favicon.svg",
+  "size": [
+   256,
+   256
+  ],
+  "mode": "full"
+ },
+ "prudentialmy": {
+  "ok": true,
+  "source": "site:0",
+  "url": "https://www.prudential.com.my/etc.clientlibs/prudential-aem-common/clientlibs/clientlib-site/resources/icons/safari-pinned-tab.svg",
+  "size": [
+   256,
+   256
+  ],
+  "mode": "padded"
+ },
+ "aiamy": {
+  "ok": true,
+  "source": "apple-touch-icon",
+  "url": "https://www.aia.com.my/apple-touch-icon.png",
+  "size": [
+   180,
+   180
+  ],
+  "mode": "full"
+ },
+ "allianzmy": {
+  "ok": true,
+  "source": "google",
+  "url": "https://www.google.com/s2/favicons?domain=allianz.com.my&sz=256",
+  "size": [
+   159,
+   159
+  ],
+  "mode": "padded"
+ },
+ "etiqa": {
+  "ok": true,
+  "source": "site:64",
+  "url": "https://www.etiqa.com.my/favicon.ico",
+  "size": [
+   64,
+   64
+  ],
+  "mode": "full"
+ },
+ "takafulmalaysia": {
+  "ok": true,
+  "source": "site:500",
+  "url": "https://www.takaful-malaysia.com.my/wp-content/uploads/2023/03/Favicon.svg",
+  "size": [
+   256,
+   256
+  ],
+  "mode": "padded"
+ },
+ "stashaway": {
+  "ok": true,
+  "source": "google",
+  "url": "https://www.google.com/s2/favicons?domain=stashaway.my&sz=256",
+  "size": [
+   96,
+   96
+  ],
+  "mode": "full"
+ },
+ "versa": {
+  "ok": true,
+  "source": "site:192",
+  "url": "https://versa.com.my/storage/2023/08/cropped-appicon-1-192x192.png",
+  "size": [
+   192,
+   192
+  ],
+  "mode": "padded"
+ },
+ "rakutentrade": {
+  "ok": true,
+  "source": "site:500",
+  "url": "https://www.rakutentrade.my/images/RT_192px.png",
+  "size": [
+   192,
+   192
+  ],
+  "mode": "full"
+ },
+ "moomoomy": {
+  "ok": true,
+  "source": "site:0",
+  "url": "https://cdn.futustatic.com/moomoo_common/images/favicon.ico?t=1770362354684",
+  "size": [
+   32,
+   32
+  ],
+  "mode": "padded"
+ },
+ "luno": {
+  "ok": true,
+  "source": "site:500",
+  "url": "https://framerusercontent.com/images/V3ch9EE5AOAea8iGKidfFECyrI.png",
+  "size": [
+   256,
+   256
+  ],
+  "mode": "full"
+ },
+ "mytaxi": {
+  "ok": true,
+  "source": "google",
+  "url": "https://www.google.com/s2/favicons?domain=indrive.com&sz=256",
+  "size": [
+   48,
+   48
+  ],
+  "mode": "padded"
+ },
+ "airasiamove": {
+  "ok": true,
+  "source": "site:500",
+  "url": "https://www.airasia.com/favicon.ico",
+  "size": [
+   32,
+   32
+  ],
+  "mode": "padded"
+ }
+}
