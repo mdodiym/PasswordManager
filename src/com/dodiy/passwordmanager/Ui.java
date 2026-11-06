@@ -36,6 +36,14 @@ final class Ui {
         }
     }
 
+    static String versionName(Context c) {
+        try {
+            return c.getPackageManager().getPackageInfo(c.getPackageName(), 0).versionName;
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
     static EditText passwordField(Context c, String hint) {
         EditText e = new EditText(c);
         e.setHint(hint);

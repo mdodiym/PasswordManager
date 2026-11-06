@@ -22,6 +22,12 @@ public final class VaultTest {
         return true;
     }
 
+    static VaultData data(ArrayList<Entry> l) {
+        VaultData d = new VaultData();
+        d.entries.addAll(l);
+        return d;
+    }
+
     public static void main(String[] args) throws Exception {
         // AES-GCM
         byte[] k = Crypto.random(32);
@@ -59,12 +65,12 @@ public final class VaultTest {
         Entry a = new Entry(); a.title = "Google"; a.provider = "google"; a.username = "me@gmail.com"; a.password = "p@ss \"quoted\" ✓"; a.notes = "line1\nline2";
         Entry b = new Entry(); b.title = "Work GitHub"; b.provider = "github"; b.username = "dodiy";
         list.add(a); list.add(b);
-        ArrayList<Entry> back = Vault.parseEntries(Crypto.utf8(Vault.entriesJson(list)));
+        ArrayList<Entry> back = Vault.parse(Crypto.utf8(Vault.toJson(data(list)))).entries;
         check("json round trip size", back.size() == 2);
         check("json round trip fields", back.get(0).password.equals(a.password) && back.get(0).notes.equals(a.notes) && back.get(1).provider.equals("github"));
-        byte[] file = Vault.exportBackup(list, "backup-pass".toCharArray());
+        byte[] file = Vault.exportBackup(data(list), "backup-pass".toCharArray());
         check("backup does not contain plaintext", !Crypto.str(file).contains("me@gmail.com"));
-        ArrayList<Entry> restored = Vault.importBackup(file, "backup-pass".toCharArray());
+        ArrayList<Entry> restored = Vault.importBackup(file, "backup-pass".toCharArray()).entries;
         check("backup restore", restored.size() == 2 && restored.get(0).username.equals("me@gmail.com"));
         try { Vault.importBackup(file, "nope-nope".toCharArray()); check("backup wrong password", false); }
         catch (Exception e) { check("backup wrong password -> AEADBadTag", Vault.isWrongPassword(e)); }
@@ -84,11 +90,37 @@ public final class VaultTest {
         Field pin = new Field("PIN", Field.PIN); pin.value = "123456"; withFields.fields.add(pin);
         Field q = new Field("Security question", Field.TEXT); q.value = "First school?"; withFields.fields.add(q);
         ArrayList<Entry> one = new ArrayList<>(); one.add(withFields);
-        Entry wf = Vault.parseEntries(Crypto.utf8(Vault.entriesJson(one))).get(0);
+        Entry wf = Vault.parse(Crypto.utf8(Vault.toJson(data(one)))).entries.get(0);
         check("fields round trip", wf.fields.size() == 2 && wf.fields.get(0).type.equals(Field.PIN) && wf.fields.get(0).value.equals("123456") && wf.fields.get(0).isHidden());
-        Entry old = Vault.parseEntries(Crypto.utf8("{\"v\":1,\"entries\":[{\"id\":\"x\",\"title\":\"Old\"}]}")).get(0);
+        Entry old = Vault.parse(Crypto.utf8("{\"v\":1,\"entries\":[{\"id\":\"x\",\"title\":\"Old\"}]}")).entries.get(0);
         check("entries from 0.1.0002 load with no fields", old.fields.isEmpty() && old.title.equals("Old"));
         check("field catalog types valid", catalogOk());
+        check("old vault has no owner fields", old.ownerId.isEmpty() && old.portfolioId.isEmpty());
+
+        // People, portfolios, Owner / Assignee / Project Manager
+        VaultData vd = new VaultData();
+        Person ali = new Person(); ali.name = "Ali"; ali.email = "ali@x.my";
+        Person siti = new Person(); siti.name = "Siti"; siti.role = "Finance";
+        vd.people.add(ali); vd.people.add(siti);
+        Portfolio office = new Portfolio(); office.name = "Office"; office.ownerId = ali.id;
+        vd.portfolios.add(office);
+        Entry bank = new Entry(); bank.title = "Maybank"; bank.portfolioId = office.id; bank.ownerId = ali.id; bank.assigneeId = siti.id; bank.managerId = ali.id;
+        vd.entries.add(bank);
+        VaultData vd2 = Vault.parse(Crypto.utf8(Vault.toJson(vd)));
+        check("people/portfolios round trip", vd2.people.size() == 2 && vd2.portfolios.get(0).ownerId.equals(ali.id) && vd2.people.get(1).role.equals("Finance"));
+        Entry b2 = vd2.entries.get(0);
+        check("login owner/assignee/manager round trip", b2.portfolioId.equals(office.id) && b2.ownerId.equals(ali.id) && b2.assigneeId.equals(siti.id) && b2.managerId.equals(ali.id));
+        check("uses counts logins and portfolios", Vault.uses(vd2, ali.id) == 2 && Vault.uses(vd2, siti.id) == 1);
+        byte[] bf = Vault.exportBackup(vd2, "backup-pass".toCharArray());
+        VaultData fromBackup = Vault.importBackup(bf, "backup-pass".toCharArray());
+        VaultData empty = new VaultData();
+        Vault.merge(empty, fromBackup);
+        check("backup restores people and portfolios", empty.people.size() == 2 && empty.portfolios.size() == 1 && empty.entries.size() == 1);
+        check("removePerson clears references", Vault.removePerson(vd2, ali.id) == 2 && vd2.people.size() == 1
+                && vd2.entries.get(0).ownerId.isEmpty() && vd2.entries.get(0).managerId.isEmpty()
+                && vd2.entries.get(0).assigneeId.equals(siti.id) && vd2.portfolios.get(0).ownerId.isEmpty());
+        Vault.removePortfolio(vd2, office.id);
+        check("removePortfolio keeps logins", vd2.portfolios.isEmpty() && vd2.entries.size() == 1 && vd2.entries.get(0).portfolioId.isEmpty());
 
         // 2FA codes, RFC 6238 test vectors (SHA-1)
         Totp t8 = Totp.parse("otpauth://totp/Test?secret=GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ&digits=8&period=30");

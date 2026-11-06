@@ -63,7 +63,7 @@ final class Vault {
         byte[] vaultKey = Crypto.random(32);
         byte[] pw = Crypto.seal(kek, vaultKey);
         Crypto.wipe(kek);
-        Session.open(vaultKey, pw, new ArrayList<Entry>());
+        Session.open(vaultKey, pw, new VaultData());
         save(c);   // data file first, so a vault never exists without its data
         JSONObject m = new JSONObject();
         m.put("v", 2);
@@ -80,7 +80,7 @@ final class Vault {
         JSONObject m = readMeta(c);
         byte[] pw = Crypto.unb64(m.getString("pw"));
         byte[] vaultKey = unwrap(m, pw, password);
-        Session.open(vaultKey, pw, parseEntries(Crypto.open(vaultKey, read(data(c)))));
+        Session.open(vaultKey, pw, parse(Crypto.open(vaultKey, read(data(c)))));
     }
 
     private static byte[] unwrap(JSONObject m, byte[] wrapped, char[] password) throws Exception {
@@ -102,7 +102,7 @@ final class Vault {
     static void unlockWithBio(Context c, Cipher authorised) throws Exception {
         JSONObject m = readMeta(c);
         byte[] vaultKey = authorised.doFinal(Crypto.unb64(m.getString("bio")));
-        Session.open(vaultKey, Crypto.unb64(m.getString("pw")), parseEntries(Crypto.open(vaultKey, read(data(c)))));
+        Session.open(vaultKey, Crypto.unb64(m.getString("pw")), parse(Crypto.open(vaultKey, read(data(c)))));
     }
 
     /** Fresh Keystore key + cipher; show it in a biometric prompt, then call {@link #enableBio}. */
@@ -142,7 +142,7 @@ final class Vault {
     static void legacyUnlockAndUpgrade(Context c, byte[] inner, char[] password) throws Exception {
         JSONObject m = readMeta(c);
         byte[] vaultKey = unwrap(m, inner, password);
-        ArrayList<Entry> list = parseEntries(Crypto.open(vaultKey, read(data(c))));
+        VaultData list = parse(Crypto.open(vaultKey, read(data(c))));
         JSONObject n = new JSONObject();
         n.put("v", 2);
         n.put("salt", m.getString("salt"));
@@ -183,23 +183,35 @@ final class Vault {
     // ---- entries -------------------------------------------------------------------------------
 
     static void save(Context c) throws Exception {
-        writeAtomic(data(c), Crypto.seal(Session.key, Crypto.utf8(entriesJson(Session.entries))));
+        writeAtomic(data(c), Crypto.seal(Session.key, Crypto.utf8(toJson(Session.data()))));
     }
 
-    static String entriesJson(List<Entry> list) throws JSONException {
+    static String toJson(VaultData d) throws JSONException {
         JSONArray a = new JSONArray();
-        for (Entry e : list) a.put(e.toJson());
+        for (Entry e : d.entries) a.put(e.toJson());
+        JSONArray pe = new JSONArray();
+        for (Person p : d.people) pe.put(p.toJson());
+        JSONArray po = new JSONArray();
+        for (Portfolio p : d.portfolios) po.put(p.toJson());
         JSONObject o = new JSONObject();
-        o.put("v", 1);
+        o.put("v", 2);
         o.put("entries", a);
+        o.put("people", pe);
+        o.put("portfolios", po);
         return o.toString();
     }
 
-    static ArrayList<Entry> parseEntries(byte[] json) throws JSONException {
-        JSONArray a = new JSONObject(Crypto.str(json)).getJSONArray("entries");
-        ArrayList<Entry> out = new ArrayList<>();
-        for (int i = 0; i < a.length(); i++) out.add(Entry.fromJson(a.getJSONObject(i)));
-        return out;
+    /** Reads vault / backup JSON; files from 0.1.0006 and earlier have no people or portfolios. */
+    static VaultData parse(byte[] json) throws JSONException {
+        JSONObject o = new JSONObject(Crypto.str(json));
+        VaultData d = new VaultData();
+        JSONArray a = o.getJSONArray("entries");
+        for (int i = 0; i < a.length(); i++) d.entries.add(Entry.fromJson(a.getJSONObject(i)));
+        JSONArray pe = o.optJSONArray("people");
+        if (pe != null) for (int i = 0; i < pe.length(); i++) d.people.add(Person.fromJson(pe.getJSONObject(i)));
+        JSONArray po = o.optJSONArray("portfolios");
+        if (po != null) for (int i = 0; i < po.length(); i++) d.portfolios.add(Portfolio.fromJson(po.getJSONObject(i)));
+        return d;
     }
 
     // ---- reset ---------------------------------------------------------------------------------
@@ -216,10 +228,10 @@ final class Vault {
 
     // ---- encrypted backup file (password only, so it can be restored on a new phone) ------------
 
-    static byte[] exportBackup(List<Entry> list, char[] password) throws Exception {
+    static byte[] exportBackup(VaultData list, char[] password) throws Exception {
         byte[] salt = Crypto.random(16);
         byte[] k = Crypto.deriveKey(password, salt, ITERATIONS);
-        byte[] ct = Crypto.seal(k, Crypto.utf8(entriesJson(list)));
+        byte[] ct = Crypto.seal(k, Crypto.utf8(toJson(list)));
         Crypto.wipe(k);
         JSONObject o = new JSONObject();
         o.put("format", BACKUP_FORMAT);
@@ -232,12 +244,12 @@ final class Vault {
     }
 
     /** Throws AEADBadTagException for a wrong password, JSONException for a file that is not a backup. */
-    static ArrayList<Entry> importBackup(byte[] file, char[] password) throws Exception {
+    static VaultData importBackup(byte[] file, char[] password) throws Exception {
         JSONObject o = new JSONObject(Crypto.str(file));
         if (!BACKUP_FORMAT.equals(o.optString("format"))) throw new JSONException("Not a Dodiy Password Manager backup");
         byte[] k = Crypto.deriveKey(password, Crypto.unb64(o.getString("salt")), o.getInt("iter"));
         try {
-            return parseEntries(Crypto.open(k, Crypto.unb64(o.getString("data"))));
+            return parse(Crypto.open(k, Crypto.unb64(o.getString("data"))));
         } finally {
             Crypto.wipe(k);
         }
@@ -252,6 +264,54 @@ final class Vault {
             if (found < 0) { into.add(in); n++; }
             else if (in.updated > into.get(found).updated) { into.set(found, in); n++; }
         }
+        return n;
+    }
+
+    /** Merges a whole backup: logins, people and portfolios (newer copy of the same item wins). Returns logins changed. */
+    static int merge(VaultData into, VaultData incoming) {
+        for (Person in : incoming.people) {
+            int found = -1;
+            for (int i = 0; i < into.people.size(); i++) if (into.people.get(i).id.equals(in.id)) { found = i; break; }
+            if (found < 0) into.people.add(in);
+            else if (in.updated > into.people.get(found).updated) into.people.set(found, in);
+        }
+        for (Portfolio in : incoming.portfolios) {
+            int found = -1;
+            for (int i = 0; i < into.portfolios.size(); i++) if (into.portfolios.get(i).id.equals(in.id)) { found = i; break; }
+            if (found < 0) into.portfolios.add(in);
+            else if (in.updated > into.portfolios.get(found).updated) into.portfolios.set(found, in);
+        }
+        return merge(into.entries, incoming.entries);
+    }
+
+    /** Removes a person and clears them from every login and portfolio. Returns how many places used them. */
+    static int removePerson(VaultData d, String personId) {
+        int n = 0;
+        for (int i = d.people.size() - 1; i >= 0; i--) if (d.people.get(i).id.equals(personId)) d.people.remove(i);
+        long now = System.currentTimeMillis();
+        for (Entry e : d.entries) {
+            boolean used = false;
+            if (personId.equals(e.ownerId)) { e.ownerId = ""; used = true; }
+            if (personId.equals(e.assigneeId)) { e.assigneeId = ""; used = true; }
+            if (personId.equals(e.managerId)) { e.managerId = ""; used = true; }
+            if (used) { e.updated = now; n++; }
+        }
+        for (Portfolio p : d.portfolios) if (personId.equals(p.ownerId)) { p.ownerId = ""; p.updated = now; n++; }
+        return n;
+    }
+
+    /** Removes a portfolio; its logins stay, without a portfolio. */
+    static void removePortfolio(VaultData d, String portfolioId) {
+        for (int i = d.portfolios.size() - 1; i >= 0; i--) if (d.portfolios.get(i).id.equals(portfolioId)) d.portfolios.remove(i);
+        long now = System.currentTimeMillis();
+        for (Entry e : d.entries) if (portfolioId.equals(e.portfolioId)) { e.portfolioId = ""; e.updated = now; }
+    }
+
+    /** How many logins and portfolios refer to a person. */
+    static int uses(VaultData d, String personId) {
+        int n = 0;
+        for (Entry e : d.entries) if (personId.equals(e.ownerId) || personId.equals(e.assigneeId) || personId.equals(e.managerId)) n++;
+        for (Portfolio p : d.portfolios) if (personId.equals(p.ownerId)) n++;
         return n;
     }
 

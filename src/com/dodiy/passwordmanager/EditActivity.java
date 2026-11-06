@@ -21,6 +21,9 @@ public final class EditActivity extends BaseActivity {
     private ImageView logo;
     private TextView providerName;
     private FieldEditor fieldEditor;
+    /** portfolio, owner, assignee, project manager ids ("" = none) */
+    private final String[] links = {"", "", "", ""};
+    private static final String[] LINK_LABELS = {"Portfolio", "Owner", "Assignee", "Project Manager"};
 
     @Override protected void onCreate(Bundle b) {
         super.onCreate(b);
@@ -38,9 +41,17 @@ public final class EditActivity extends BaseActivity {
         original = Session.find(id);
         ((TextView) findViewById(R.id.heading)).setText(original == null ? "New login" : "Edit login");
         findViewById(R.id.delete).setVisibility(original == null ? View.GONE : View.VISIBLE);
+        if (original != null) {
+            links[0] = original.portfolioId; links[1] = original.ownerId; links[2] = original.assigneeId; links[3] = original.managerId;
+        } else if (getIntent().getStringExtra("portfolio") != null) {
+            Portfolio pf = Session.portfolio(getIntent().getStringExtra("portfolio"));
+            if (pf != null) { links[0] = pf.id; links[1] = pf.ownerId; }
+        }
         if (b != null) {
             provider = b.getString("provider", "");
             providerChosen = b.getBoolean("chosen");
+            String[] saved = b.getStringArray("links");
+            if (saved != null && saved.length == 4) System.arraycopy(saved, 0, links, 0, 4);
         } else if (original != null) {
             provider = original.provider;
             providerChosen = true;
@@ -59,6 +70,7 @@ public final class EditActivity extends BaseActivity {
             }
         }
         bindLogo();
+        bindLinks();
         fieldEditor = new FieldEditor(this, (android.widget.LinearLayout) findViewById(R.id.fieldsBox),
                 original != null ? original.fields : new java.util.ArrayList<Field>());
         findViewById(R.id.addField).setOnClickListener(new View.OnClickListener() {
@@ -113,6 +125,54 @@ public final class EditActivity extends BaseActivity {
         super.onSaveInstanceState(out);
         out.putString("provider", provider);
         out.putBoolean("chosen", providerChosen);
+        out.putStringArray("links", links);
+    }
+
+    /** The Portfolio / Owner / Assignee / Project Manager rows; each opens a picker. */
+    private void bindLinks() {
+        android.widget.LinearLayout box = findViewById(R.id.peopleBox);
+        box.removeAllViews();
+        for (int i = 0; i < 4; i++) {
+            final int k = i;
+            View row = getLayoutInflater().inflate(R.layout.item_link, box, false);
+            ((TextView) row.findViewById(R.id.label)).setText(LINK_LABELS[i]);
+            String value;
+            if (i == 0) {
+                Portfolio pf = Session.portfolio(links[0]);
+                value = pf == null ? "None" : pf.name;
+            } else {
+                String n = Session.personName(links[i]);
+                value = n.isEmpty() ? "None" : n;
+            }
+            TextView v = row.findViewById(R.id.value);
+            v.setText(value);
+            v.setTextColor(getColor(value.equals("None") ? R.color.text2 : R.color.text));
+            row.setOnClickListener(new View.OnClickListener() {
+                @Override public void onClick(View x) { pickLink(k); }
+            });
+            box.addView(row);
+        }
+    }
+
+    private void pickLink(final int k) {
+        if (k == 0) {
+            Pick.portfolio(this, links[0], new Pick.OnPicked() {
+                @Override public void picked(String id) {
+                    links[0] = id;
+                    Portfolio pf = Session.portfolio(id);
+                    // a new portfolio's owner becomes the login's owner if none is set yet
+                    if (pf != null && links[1].isEmpty()) links[1] = pf.ownerId;
+                    bindLinks();
+                }
+            });
+        } else {
+            Pick.person(this, LINK_LABELS[k], links[k], new Pick.OnPicked() {
+                @Override public void picked(String id) {
+                    links[k] = id;
+                    bindLinks();
+                }
+            });
+        }
     }
 
     private void setShowPw(boolean on) {
@@ -152,6 +212,10 @@ public final class EditActivity extends BaseActivity {
         e.url = url.getText().toString().trim();
         e.notes = notes.getText().toString();
         e.fields = fieldEditor.result();
+        e.portfolioId = links[0];
+        e.ownerId = links[1];
+        e.assigneeId = links[2];
+        e.managerId = links[3];
         e.updated = System.currentTimeMillis();
         if (original == null) Session.entries.add(e);
         if (persist()) {
@@ -186,7 +250,9 @@ public final class EditActivity extends BaseActivity {
                 || !original.url.equals(url.getText().toString().trim())
                 || !original.notes.equals(notes.getText().toString())
                 || !original.provider.equals(provider)
-                || fieldsChanged();
+                || fieldsChanged()
+                || !original.portfolioId.equals(links[0]) || !original.ownerId.equals(links[1])
+                || !original.assigneeId.equals(links[2]) || !original.managerId.equals(links[3]);
     }
 
     private boolean fieldsChanged() {

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical" android:background="@color/bg" android:fitsSystemWindows="true">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="56dp"
+        android:orientation="horizontal" android:gravity="center_vertical" android:paddingStart="4dp" android:paddingEnd="16dp">
+        <TextView android:id="@+id/back" style="@style/IconButton" android:text="←" android:contentDescription="Back" />
+        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+            android:layout_marginStart="4dp" android:orientation="vertical">
+            <TextView android:id="@+id/heading" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:textSize="20sp" android:textStyle="bold" android:textColor="@color/text" />
+            <TextView android:id="@+id/count" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:textSize="12sp" android:textColor="@color/text2" />
+        </LinearLayout>
+    </LinearLayout>
+    <FrameLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
+        <ListView android:id="@+id/list" android:layout_width="match_parent" android:layout_height="match_parent"
+            android:divider="@android:color/transparent" android:dividerHeight="6dp"
+            android:paddingStart="12dp" android:paddingEnd="12dp" android:paddingTop="6dp" android:paddingBottom="88dp"
+            android:clipToPadding="false" android:listSelector="@android:color/transparent" />
+        <TextView android:id="@+id/empty" android:layout_width="match_parent" android:layout_height="match_parent"
+            android:gravity="center" android:padding="32dp" android:textSize="16sp" android:textColor="@color/text2"
+            android:lineSpacingExtra="4dp" android:visibility="gone" />
+        <TextView android:id="@+id/add" android:layout_width="wrap_content" android:layout_height="56dp"
+            android:layout_gravity="bottom|end" android:layout_margin="16dp"
+            android:paddingStart="20dp" android:paddingEnd="22dp" android:gravity="center"
+            android:background="@drawable/fab" android:elevation="6dp"
+            android:textColor="@color/on_primary" android:textSize="16sp" android:textStyle="bold" />
+    </FrameLayout>
+</LinearLayout>

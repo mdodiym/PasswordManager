@@ -79,6 +79,15 @@ public final class DetailActivity extends BaseActivity {
             });
         }
 
+        Portfolio pf = Session.portfolio(e.portfolioId);
+        if (pf != null) {
+            String po = Session.personName(pf.ownerId);
+            field(fields, "Portfolio", pf.name + (po.isEmpty() ? "" : "  (Owner: " + po + ")"), false, null, null, null, null);
+        }
+        personField(fields, "Owner", e.ownerId);
+        personField(fields, "Assignee", e.assigneeId);
+        personField(fields, "Project Manager", e.managerId);
+
         codes.clear();
         handler.removeCallbacks(tick);
         for (int i = 0; i < e.fields.size(); i++) extraField(fields, e.fields.get(i), i, e);
@@ -99,6 +108,21 @@ public final class DetailActivity extends BaseActivity {
         java.text.DateFormat tf = DateFormat.getTimeFormat(this);
         Date c = new Date(e.created), u = new Date(e.updated);
         ((TextView) findViewById(R.id.dates)).setText("Created " + df.format(c) + " " + tf.format(c) + "\nLast changed " + df.format(u) + " " + tf.format(u));
+    }
+
+    private void personField(LinearLayout parent, String label, String personId) {
+        final Person p = Session.person(personId);
+        if (p == null) return;
+        String sub = p.subtitle();
+        Runnable email = p.email.isEmpty() ? null : new Runnable() {
+            @Override public void run() { startExternal(new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:" + p.email))); }
+        };
+        Runnable call = p.phone.isEmpty() ? null : new Runnable() {
+            @Override public void run() { startExternal(new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + p.phone))); }
+        };
+        field(parent, label, p.name + (sub.isEmpty() ? "" : "\n" + sub), false,
+                email != null ? "Email" : call != null ? "Call" : null, email != null ? email : call,
+                email != null && call != null ? "Call" : null, email != null && call != null ? call : null);
     }
 
     private void extraField(LinearLayout parent, final Field f, final int index, final Entry e) {

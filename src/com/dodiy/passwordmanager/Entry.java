@@ -19,6 +19,10 @@ final class Entry {
     long created = System.currentTimeMillis();
     long updated = created;
     ArrayList<Field> fields = new ArrayList<>();
+    String portfolioId = "";
+    String ownerId = "";      // Person ids, "" for none
+    String assigneeId = "";
+    String managerId = "";    // Project Manager
 
     JSONObject toJson() throws JSONException {
         JSONObject o = new JSONObject();
@@ -34,6 +38,10 @@ final class Entry {
         JSONArray fa = new JSONArray();
         for (Field f : fields) fa.put(f.toJson());
         o.put("fields", fa);
+        o.put("portfolio", portfolioId);
+        o.put("owner", ownerId);
+        o.put("assignee", assigneeId);
+        o.put("manager", managerId);
         return o;
     }
 
@@ -48,6 +56,10 @@ final class Entry {
         e.notes = o.optString("notes", "");
         e.created = o.optLong("created", e.created);
         e.updated = o.optLong("updated", e.created);
+        e.portfolioId = o.optString("portfolio", "");
+        e.ownerId = o.optString("owner", "");
+        e.assigneeId = o.optString("assignee", "");
+        e.managerId = o.optString("manager", "");
         JSONArray fa = o.optJSONArray("fields");
         if (fa != null) for (int i = 0; i < fa.length(); i++) {
             JSONObject f = fa.optJSONObject(i);

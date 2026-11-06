@@ -45,6 +45,9 @@
             <TextView style="@style/Label" android:text="Website (optional)" />
             <EditText android:id="@+id/url" style="@style/Field" android:inputType="textUri" android:hint="accounts.google.com"
                 android:importantForAutofill="no" />
+            <TextView style="@style/Label" android:text="Portfolio &amp; people" />
+            <LinearLayout android:id="@+id/peopleBox" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="vertical" android:background="@drawable/card" />
             <TextView style="@style/Label" android:text="More fields" />
             <LinearLayout android:id="@+id/fieldsBox" android:layout_width="match_parent" android:layout_height="wrap_content"
                 android:orientation="vertical" />

@@ -41,6 +41,9 @@ public final class MainActivity extends BaseActivity {
     private EditText search;
     private TextView empty, count;
     private char[] pendingBackupPassword;
+    /** null = all logins, "" = logins without a portfolio, otherwise a portfolio id */
+    private String filter;
+    private TextView filterView;
 
     @Override protected void onCreate(Bundle b) {
         super.onCreate(b);
@@ -62,7 +65,15 @@ public final class MainActivity extends BaseActivity {
             @Override public void afterTextChanged(Editable s) { refresh(); }
         });
         findViewById(R.id.add).setOnClickListener(new View.OnClickListener() {
-            @Override public void onClick(View v) { startActivity(new Intent(MainActivity.this, EditActivity.class)); }
+            @Override public void onClick(View v) {
+                Intent i = new Intent(MainActivity.this, EditActivity.class);
+                if (filter != null && !filter.isEmpty()) i.putExtra("portfolio", filter);
+                startActivity(i);
+            }
+        });
+        filterView = findViewById(R.id.filter);
+        filterView.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) { chooseFilter(); }
         });
         findViewById(R.id.lock).setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) { lockNow(); }
@@ -81,11 +92,15 @@ public final class MainActivity extends BaseActivity {
         String q = search.getText().toString().trim().toLowerCase(Locale.ROOT);
         shown.clear();
         for (Entry e : Session.entries) {
+            if (filter != null && !filter.equals(e.portfolioId)) continue;
             if (q.isEmpty()) { shown.add(e); continue; }
             Provider p = Providers.get(this, e.provider);
-            String hay = (e.title + " " + e.username + " " + e.url + " " + (p == null ? "" : p.title)).toLowerCase(Locale.ROOT);
+            Portfolio pf = Session.portfolio(e.portfolioId);
+            String hay = (e.title + " " + e.username + " " + e.url + " " + (p == null ? "" : p.title) + " " + (pf == null ? "" : pf.name)
+                    + " " + Session.personName(e.ownerId) + " " + Session.personName(e.assigneeId) + " " + Session.personName(e.managerId)).toLowerCase(Locale.ROOT);
             if (hay.contains(q)) shown.add(e);
         }
+        bindFilter();
         Collections.sort(shown, new Comparator<Entry>() {
             @Override public int compare(Entry a, Entry b) { return a.title.compareToIgnoreCase(b.title); }
         });
@@ -97,6 +112,47 @@ public final class MainActivity extends BaseActivity {
         adapter.notifyDataSetChanged();
     }
 
+    private void bindFilter() {
+        if (Session.portfolios.isEmpty() && filter == null) { filterView.setVisibility(View.GONE); return; }
+        filterView.setVisibility(View.VISIBLE);
+        String name;
+        if (filter == null) name = "All logins";
+        else if (filter.isEmpty()) name = "No portfolio";
+        else {
+            Portfolio pf = Session.portfolio(filter);
+            if (pf == null) { filter = null; name = "All logins"; }
+            else {
+                String o = Session.personName(pf.ownerId);
+                name = pf.name + (o.isEmpty() ? "" : " · Owner: " + o);
+            }
+        }
+        filterView.setText("Portfolio:  " + name + "   ▾");
+    }
+
+    private void chooseFilter() {
+        final ArrayList<Portfolio> list = Pick.sortedPortfolios();
+        String[] items = new String[list.size() + 3];
+        items[0] = "All logins";
+        int checked = filter == null ? 0 : filter.isEmpty() ? list.size() + 1 : 0;
+        for (int i = 0; i < list.size(); i++) {
+            items[i + 1] = list.get(i).name;
+            if (list.get(i).id.equals(filter)) checked = i + 1;
+        }
+        items[list.size() + 1] = "No portfolio";
+        items[list.size() + 2] = "Manage portfolios…";
+        new AlertDialog.Builder(this).setTitle("Show portfolio")
+                .setSingleChoiceItems(items, checked, new DialogInterface.OnClickListener() {
+                    @Override public void onClick(DialogInterface d, int w) {
+                        d.dismiss();
+                        if (w == 0) filter = null;
+                        else if (w <= list.size()) filter = list.get(w - 1).id;
+                        else if (w == list.size() + 1) filter = "";
+                        else { startActivity(new Intent(MainActivity.this, ManageActivity.class).putExtra("what", "portfolios")); return; }
+                        refresh();
+                    }
+                }).setNegativeButton("Cancel", null).show();
+    }
+
     private void lockNow() {
         Session.lock();
         finishAffinity();
@@ -106,6 +162,8 @@ public final class MainActivity extends BaseActivity {
     private void showMenu(View anchor) {
         PopupMenu pm = new PopupMenu(this, anchor);
         Menu m = pm.getMenu();
+        m.add(0, 9, 0, "People");
+        m.add(0, 10, 0, "Portfolios");
         m.add(0, 1, 0, "Password generator");
         m.add(0, 2, 0, "All provider logos");
         m.add(0, 3, 0, "Export encrypted backup");
@@ -125,6 +183,8 @@ public final class MainActivity extends BaseActivity {
                     case 6: lockNow(); return true;
                     case 7: about(); return true;
                     case 8: toggleBio(); return true;
+                    case 9: startActivity(new Intent(MainActivity.this, ManageActivity.class).putExtra("what", "people")); return true;
+                    case 10: startActivity(new Intent(MainActivity.this, ManageActivity.class).putExtra("what", "portfolios")); return true;
                 }
                 return false;
             }
@@ -132,13 +192,25 @@ public final class MainActivity extends BaseActivity {
         pm.show();
     }
 
+    /** What changed in each version, newest first. Shown in About. */
+    static final String[][] WHATS_NEW = {
+            {"0.1.0008", "People list (name, role, email, phone)\n• Portfolios, each with an Owner picked from People\n• Owner, Assignee and Project Manager on every login, picked from People\n• Filter the list by portfolio; search finds people and portfolios\n• About shows the version and what's new"},
+            {"0.1.0006", "Extra fields from a list of standard identity and access fields, with live 2FA codes\n• Unlock with fingerprint OR master password\n• 100 Malaysian banks and services with their own icons"},
+            {"0.1.0002", "First release: encrypted vault, 3,500 provider logos, password generator, encrypted backup"},
+    };
+
     private void about() {
+        StringBuilder b = new StringBuilder();
+        b.append(Ui.version(this)).append("\n");
+        b.append(WHATS_NEW[0][0].equals(Ui.versionName(this)) ? "This is the latest version.\n" : "").append("\n");
+        for (String[] v : WHATS_NEW) b.append("What's new in ").append(v[0]).append("\n• ").append(v[1]).append("\n\n");
+        b.append("Your logins are stored only on this phone, encrypted with AES-256. The vault opens with your master password, or with your fingerprint if you turned that on (its key lives in the Android Keystore).\n\n");
+        b.append("The vault locks as soon as you leave the app, screenshots are blocked, and copied passwords are cleared from the clipboard after 45 seconds.\n\n");
+        b.append(Providers.all(this).size()).append(" provider logos are included. Brand logos from Simple Icons (CC0) and the providers' own icons; they are trademarks of their owners.\n\n");
+        b.append("New versions: github.com/mdodiym/PasswordManager/releases");
         new AlertDialog.Builder(this)
-                .setTitle(getString(R.string.app_name))
-                .setMessage(Ui.version(this) + "\n\n"
-                        + "Your logins are stored only on this phone, encrypted with AES-256. The vault opens with your master password, or with your fingerprint if you turned that on (the key for it lives in the Android Keystore).\n\n"
-                        + "The vault locks as soon as you leave the app, screenshots are blocked, and copied passwords are cleared from the clipboard after 45 seconds.\n\n"
-                        + Providers.all(this).size() + " provider logos are included. Brand logos from Simple Icons (CC0); they are trademarks of their owners.")
+                .setTitle(getString(R.string.app_name) + " " + Ui.versionName(this))
+                .setMessage(b.toString())
                 .setPositiveButton("OK", null).show();
     }
 
@@ -338,7 +410,10 @@ public final class MainActivity extends BaseActivity {
         if (res != RESULT_OK || data == null || data.getData() == null || pw == null || !Session.isOpen()) { Crypto.wipe(pw); return; }
         final Uri uri = data.getData();
         if (req == REQ_EXPORT) {
-            final ArrayList<Entry> copy = new ArrayList<>(Session.entries);
+            final VaultData copy = new VaultData();
+            copy.entries.addAll(Session.entries);
+            copy.people.addAll(Session.people);
+            copy.portfolios.addAll(Session.portfolios);
             Ui.toast(this, "Encrypting backup…");
             new Ui.Task<Void>() {
                 @Override Void work() throws Exception {
@@ -350,13 +425,13 @@ public final class MainActivity extends BaseActivity {
                     return null;
                 }
                 @Override void done(Void r, Exception e) {
-                    Ui.toast(MainActivity.this, e == null ? "Backup saved (" + copy.size() + " logins)" : "Backup failed: " + e.getMessage());
+                    Ui.toast(MainActivity.this, e == null ? "Backup saved (" + copy.entries.size() + " logins, " + copy.people.size() + " people, " + copy.portfolios.size() + " portfolios)" : "Backup failed: " + e.getMessage());
                 }
             }.run(this);
         } else if (req == REQ_IMPORT) {
             Ui.toast(this, "Decrypting backup…");
-            new Ui.Task<ArrayList<Entry>>() {
-                @Override ArrayList<Entry> work() throws Exception {
+            new Ui.Task<VaultData>() {
+                @Override VaultData work() throws Exception {
                     try {
                         InputStream in = getContentResolver().openInputStream(uri);
                         byte[] bytes;
@@ -364,16 +439,17 @@ public final class MainActivity extends BaseActivity {
                         return Vault.importBackup(bytes, pw);
                     } finally { Crypto.wipe(pw); }
                 }
-                @Override void done(ArrayList<Entry> list, Exception e) {
+                @Override void done(VaultData list, Exception e) {
                     if (e != null) {
                         Ui.toast(MainActivity.this, Vault.isWrongPassword(e) ? "Wrong backup password" : "Could not restore: " + e.getMessage());
                         return;
                     }
                     if (!Session.isOpen()) return;
-                    int n = Vault.merge(Session.entries, list);
+                    int n = Vault.merge(Session.data(), list);
                     try { Vault.save(MainActivity.this); } catch (Exception ex) { Ui.toast(MainActivity.this, "Could not save: " + ex.getMessage()); return; }
                     refresh();
-                    Ui.toast(MainActivity.this, "Restored " + n + " of " + list.size() + " logins");
+                    Ui.toast(MainActivity.this, "Restored " + n + " of " + list.entries.size() + " logins"
+                            + (list.people.isEmpty() && list.portfolios.isEmpty() ? "" : ", with people and portfolios"));
                 }
             }.run(this);
         }
@@ -390,7 +466,12 @@ public final class MainActivity extends BaseActivity {
             final Entry e = shown.get(pos);
             Ui.setLogo((ImageView) v.findViewById(R.id.logo), MainActivity.this, e.provider, e.title);
             ((TextView) v.findViewById(R.id.title)).setText(e.title.isEmpty() ? "(no name)" : e.title);
-            ((TextView) v.findViewById(R.id.subtitle)).setText(e.username.isEmpty() ? "No username" : e.username);
+            StringBuilder sub = new StringBuilder(e.username.isEmpty() ? "No username" : e.username);
+            Portfolio pf = Session.portfolio(e.portfolioId);
+            if (pf != null && filter == null) sub.append(" · ").append(pf.name);
+            String owner = Session.personName(e.ownerId);
+            if (!owner.isEmpty()) sub.append(" · ").append(owner);
+            ((TextView) v.findViewById(R.id.subtitle)).setText(sub);
             TextView action = v.findViewById(R.id.action);
             action.setText("Copy");
             action.setVisibility(e.password.isEmpty() ? View.GONE : View.VISIBLE);

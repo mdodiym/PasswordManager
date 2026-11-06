@@ -29,6 +29,7 @@
         <activity android:name=".MainActivity" android:exported="false" android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity android:name=".DetailActivity" android:exported="false" />
         <activity android:name=".EditActivity" android:exported="false" android:windowSoftInputMode="adjustResize|stateHidden" />
+        <activity android:name=".ManageActivity" android:exported="false" />
         <activity android:name=".PickerActivity" android:exported="false" android:windowSoftInputMode="adjustResize|stateHidden" />
     </application>
 </manifest>
